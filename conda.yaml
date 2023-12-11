@@ -1,0 +1,4 @@
+
+SQLAlchemy==1.1.8
+python-dotenv==0.19.1
+# Add other dependencies as needed
