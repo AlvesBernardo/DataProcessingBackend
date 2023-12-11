@@ -1,5 +1,5 @@
 import unittest
-import sys # added!
+import sys
 sys.path.append("..") # added!
 from src.Quality import Quality
 
