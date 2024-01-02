@@ -12,7 +12,7 @@ class TestSubscriptionClass(unittest.TestCase):
         subscription = Subscription(
             "Paypal",
             datetime.date(2022, 12, 25), # Corrected initialization
-            hd_quality,
+            self.hd_quality,
             False,
             False,
             10.99,
@@ -21,7 +21,7 @@ class TestSubscriptionClass(unittest.TestCase):
         actual_date_of_signup = subscription.get_dateOfSignUp()
         expected_date_of_signup = datetime.date(2022, 12, 25)  # Corrected date
         self.assertEqual(actual_date_of_signup, expected_date_of_signup, f"Actual: {actual_date_of_signup}")
-        self.assertEqual(subscription.get_typeOfSubscription(), HDQuality)
+        self.assertEqual(subscription.get_typeOfSubscription(), self.hd_quality)
         self.assertEqual(subscription.get_inviteDiscountStatus(), False)
         self.assertEqual(subscription.get_sevenDaysFreeTrailStatus(), False)
         self.assertEqual(subscription.get_price(), 10.99)

@@ -18,8 +18,7 @@ class Subscription:
             raise ValueError("typeOfSubscription must be an instance of Quality or its subclass.")
          self._payment = payment
          self.set_dateOfSignUp(dateOfSignUp)          
-         self.type = typeOfSubscription
-         self.inviteDiscount = inviteDiscount
+         self._typeOfSubscription = typeOfSubscription
          self.sevenDaysFreeTrail = True
          self.price = price
 
@@ -41,12 +40,12 @@ class Subscription:
         return self._inviteDiscount
 
 
-    def get_secenDaysFreeTrailStatus(self):
+    def get_sevenDaysFreeTrailStatus(self):
         return self._sevenDaysFreeTrail
 
-
     def get_price(self):
-        return self._price
+        return self._price  # Update this line
+
 
 
     # setter method
