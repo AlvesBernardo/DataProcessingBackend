@@ -12,9 +12,17 @@ from services.jwt_handler import decode_jwt_token
 from services.auth_guard import check_jwt_token
 from services.makeToken import make_token
 
+
+
+#routes 
+from routes.userRoutes import *
+
 @app.route('/')
 def index():
     return render_template('index.html', subscriptions=quality_instances)
+
+@app.route('/register')
+
 
 @app.route('/select_subscription', methods=['POST'])
 #@auth_guard()
@@ -39,8 +47,10 @@ def get_subscription(subscription):
     else:
         return "User has not selected a subscription yet."
 
-#dummy generator function
 
+app.add_url_rule("login", log_in, method=["POST"])
+app.add_url_rule("/register", register, mehtod=["POST"])
+app.add_url_rule("/forgotPassword", forgotPassword, method=["POST"])
 
 # Dummy protected route
 @app.route('/protected_route', methods=['GET'])
