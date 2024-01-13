@@ -1,5 +1,7 @@
 from sqlalchemy import Table, Column, Integer, String, Date, Float, Boolean, ForeignKey , Date , Interval
-from config.connection_configuration import engine
+import sys
+sys.path.append('../')
+from src.config.connection_configuration import engine 
 from datetime import timedelta
 meta = MetaData(bind=engine)
 view_table = Table(
