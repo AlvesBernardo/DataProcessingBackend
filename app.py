@@ -3,7 +3,7 @@ from flask import Flask
 import sys
 sys.path.append("..") # added!
 from src.instances import quality_instances
-from services.auth_guard import check_jwt_token
+from services.auth_guard import *
 from services.jwt_handler import generate_jwt_token
 app = Flask(__name__)
 from flask import jsonify
@@ -45,8 +45,9 @@ def get_subscription(subscription):
 # Dummy protected route
 @app.route('/protected_route', methods=['GET'])
 def protected_route():
+    
     token = make_token()
-
+    auth_guard
     try:
         # Call check_jwt_token as a standalone function with the generated token
         user_data = check_jwt_token(token)
