@@ -1,11 +1,12 @@
 from .Subscription import Subscription
+from typing import List, Type
+from .profile import Profile
 
 class Account:
     _email = ""
     _password = ""
-    _profileList = []
+    _profileList = List[Type[Profile]]
     _max_profiles = 4  
-
     _typeOfSubscription = Subscription
     _isAccountBlocked = False
     _isAdmin = False
@@ -72,7 +73,7 @@ class Account:
 
     def set_language(self, language):
         self._language = language
-        
+
     @classmethod
     def get_instances(cls):
         return cls._instances

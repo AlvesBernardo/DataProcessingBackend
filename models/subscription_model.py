@@ -4,7 +4,7 @@ from config.connection_configuration import engine
 meta = MetaData(bind=engine)       
          
 subscription_table = Table(
-    "subscription",
+    "dbo.tblSubscription",
     meta,
     Column("idSubscription", Integer, primary_key=True),
     Column("dtPayment", String),
