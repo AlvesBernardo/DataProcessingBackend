@@ -11,7 +11,7 @@ db_tblProfile = Table(
     Column("dtPicture",String(50), nullable=False),
     Column("dtIsMinor", Boolean,  default=False),
     Column("dtLanguage", String(50), default=False),
-    Column("dtLanguage", String(50)),
+    
     Column("fiAccount",Integer,  ForeignKey("dbo.tblAccount.idGenre")),
     Column("fiGenre",Integer, ForeignKey("tblGenre.idGenre")),
 )

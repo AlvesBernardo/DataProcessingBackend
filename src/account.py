@@ -1,12 +1,9 @@
-from .Subscription import Subscription
+from Subscription import Subscription
 from typing import List, Type
-from .profile import Profile
 
 class Account:
     _email = ""
     _password = ""
-    _profileList = List[Type[Profile]]
-    _max_profiles = 4  
     _typeOfSubscription = Subscription
     _isAccountBlocked = False
     _isAdmin = False
@@ -14,11 +11,10 @@ class Account:
 
 
 
-    def __init__(self, email="", password="", profile_list=None, subscription=None,
+    def __init__(self, email="", password="", subscription=None,
                  is_account_blocked=False, is_admin=False, language=""):
         self._email = email
         self._password = password
-        self._profile_list = []
         self._type_of_subscription = subscription or Subscription()
         self._is_account_blocked = is_account_blocked
         self._is_admin = is_admin
@@ -30,13 +26,6 @@ class Account:
 
     def get_password(self):
         return self._password
-
-    def get_profile_list(self):
-        return self._profile_list
-
-    def get_max_profiles(self):
-        return self._max_profiles
-
     def get_type_of_subscription(self):
         return self._type_of_subscription
 
@@ -55,13 +44,6 @@ class Account:
 
     def set_password(self, password):
         self._password = password
-
-    def set_profile_list(self, profile_list):
-        self._profile_list = profile_list
-
-    def set_max_profiles(self, max_profiles):
-        self._max_profiles = max_profiles
-
     def set_type_of_subscription(self, subscription):
         self._type_of_subscription = subscription
 

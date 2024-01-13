@@ -2,7 +2,6 @@ import sys
 sys.path.append("..")
 import datetime
 import unittest
-
 from src.View import View
 from src.Subtitle import Subtitle
 from src.Movie import Movie

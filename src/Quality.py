@@ -1,8 +1,9 @@
+from QualityTypeEnum import QualityType
 class Quality:
     _instances = []
     _max_instances = 3
 
-    def __init__(self, description, price):
+    def __init__(self, description : QualityType, price : float):
         if len(Quality._instances) >= Quality._max_instances:
             raise ValueError("Only three instances of Quality are allowed.")
         self.__description = description

@@ -1,9 +1,9 @@
-from .account import Account
-from .Genre import Genre
-from .View import View
+from account import Account
+from Genre import Genre
+from View import View
 from typing import List, Type
-from .Classification import Classification
-from .imageType_enum import ImageType
+from Classification import Classification
+from imageType_enum import ImageType
 
 class Profile:
     _user = Account
@@ -17,10 +17,11 @@ class Profile:
     _language = ""
     _classification = List[Type[Classification]]
 
-    def __init__(self, user: Type[Account], name: str = "", picture: List[str] = None,
+    def __init__(self, user: Account, name: str = "", picture: List[str] = None,
                  max_pictures: int = 4, language: str = "", to_watch_list: List[str] = None,
-                 selected_genre: List[Type[Genre]] = None, view_list: List[Type[View]] = None,
-                 classification: List[Type[Classification]] = None):
+                 selected_genre: List[Genre] = None, view_list: List[View] = None,
+                 classification: List[Classification] = None):
+
         self._user = user
         self._name = name
         self._picture = picture or []
