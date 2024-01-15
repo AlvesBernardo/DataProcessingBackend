@@ -1,10 +1,22 @@
-from sqlalchemy import Table, Column, Integer, String, Date, Float, Boolean, ForeignKey , Date , Interval
+from sqlalchemy import Table, Column, Integer, String, MetaData
 from config.connection_configuration import engine
-from datetime import timedelta
-meta = MetaData(bind=engine)
-view_table = Table(
-    "classification",
-    meta,
-    Column("idClassification", Integer, primary_key=True),
-    Column("dtDescription", String)
-)
+
+try:
+    # Attempt to create a connection to the database
+    meta = MetaData()
+    meta.bind = engine
+
+
+    view_table = Table(
+        "classification",
+        meta,
+        Column("idClassification", Integer, primary_key=True),
+        Column("dtDescription", String)
+    )
+
+    # Perform any additional operations using the view_table or meta if needed
+
+    print("Connection to the database successful!")
+
+except Exception as e:
+    print(f"An error occurred: {e}")

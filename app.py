@@ -11,7 +11,9 @@ import requests
 from services.jwt_handler import decode_jwt_token
 from services.auth_guard import check_jwt_token
 from services.makeToken import make_token
+from config.connection_configuration import session, engine
 
+db = SQLAlchemy(app)
 
 
 #routes 
@@ -51,6 +53,9 @@ def get_subscription(subscription):
 app.add_url_rule("login", log_in, method=["POST"])
 app.add_url_rule("/register", register, mehtod=["POST"])
 app.add_url_rule("/forgotPassword", forgotPassword, method=["POST"])
+app.add_url_rule("/getInvitationCode", getInvitationCode, method=["POST"])
+
+
 
 # Dummy protected route
 @app.route('/protected_route', methods=['GET'])

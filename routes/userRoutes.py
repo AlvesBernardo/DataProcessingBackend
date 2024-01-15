@@ -4,10 +4,16 @@ import sys
 sys.path.append("..") # added!
 from controller.register import registerUSer
 from controller.loginController import login
+from controller.numberGenerator import randomNumberGenerator
+from models.movie_model import MovieModel
+from config.connection_configuration import engine, session
+from app import app
+
 
 user_routes_bp = Blueprint('user_routes', __name__)
 
-@user_routes_bp.route('/login', methods=['GET', 'POST'])
+play_count = {}
+
 def log_in():
     error_message = None
 
@@ -65,4 +71,24 @@ def forgotPassword():
 
 
 def getInvitationCode():
-    number = random
+    number = randomNumberGenerator
+
+
+def play_movie():
+    movie_title = request.form["movie_title"]
+    
+    movie = session.query(MovieModel).filter(MovieModel.c.dtTitle == movie_title).first()
+
+    if movie_title not in play_count
+        play_count[movie_title] = 1
+    else
+        play_count[movie_title] += 1
+
+    
+def getHowManyTimesMoviePlayed(Movie):
+    movie_title = request.args.get('movie_title')
+
+    if movie_title not in play_count
+        return jsonify("movie never played")
+    else
+        return jsonify(play_count[movie_title])
