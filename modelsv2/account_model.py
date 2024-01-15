@@ -1,16 +1,11 @@
 from flask import Flask
 from config.connection_configuration import engine
+from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'your_database_uri_here'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configuring the engine in the Flask app
-engine = create_engine('your_database_uri_here')
 
 # Creating the SQLAlchemy instance
-db = SQLAlchemy(app)
-db.metadata.bind = engine
+db = SQLAlchemy()
 
 class Account(db.Model):
     idAccount = db.Column(db.Integer, primary_key=True)

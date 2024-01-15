@@ -4,9 +4,8 @@ import re
 from werkzeug.security import generate_password_hash
 import sys
 sys.path.append("..")
-def logIn():
 
-        
+def logIn():        
     email = request.form['email']
     password = request.form['password']
 

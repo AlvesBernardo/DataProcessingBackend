@@ -3,18 +3,17 @@ from flask import Blueprint, render_template, request, redirect, url_for
 import sys
 sys.path.append("..") # added!
 from controller.register import registerUSer
-from controller.loginController import login
-from controller.numberGenerator import randomNumberGenerator
-from models.movie_model import MovieModel
+from controller.loginController import logIn
+#from controller.numberGenerator import randomNumberGenerator
+#from models.movie_model import MovieModel
 from config.connection_configuration import engine, session
-from app import app
 
 
 user_routes_bp = Blueprint('user_routes', __name__)
 
 play_count = {}
 
-def log_in():
+def logInUser():
     error_message = None
 
     if request.method == 'POST':
@@ -70,25 +69,45 @@ def forgotPassword():
                 error_message = 'Invalid credentials'
 
 
-def getInvitationCode():
+#def getInvitationCode():
     number = randomNumberGenerator
 
 
 def play_movie():
     movie_title = request.form["movie_title"]
     
-    movie = session.query(MovieModel).filter(MovieModel.c.dtTitle == movie_title).first()
+    view = session.query(ViewModel).join(MovieModel).filter(MovieModel.c.dtTitle == movie_title).first()
 
-    if movie_title not in play_count
+    if movie_title not in play_count:
         play_count[movie_title] = 1
-    else
+    else:
         play_count[movie_title] += 1
 
     
 def getHowManyTimesMoviePlayed(Movie):
     movie_title = request.args.get('movie_title')
 
-    if movie_title not in play_count
+    if movie_title not in play_count:
         return jsonify("movie never played")
-    else
+    else:
         return jsonify(play_count[movie_title])
+    
+def forgotPass():
+    
+    error_message = None
+
+    if request.method == 'POST':
+        
+        email = request.form['email']
+
+        if not is_valid_email(email):
+            error_message = 'Invalid email format'
+        else:
+            email_data = {'email': email}
+            email_response = requests.post(f'{API_BASE_URL}/forgotPass', json=email_data)
+            if email_response.status_code == 200:
+                return redirect(url_for('success'))
+            else:
+                error_message = 'Invalid credentials'
+
+    return render_template('forgotPass.html', error_message=error_message)

@@ -4,15 +4,15 @@ import re
 from werkzeug.security import generate_password_hash
 import sys
 sys.path.append("..")
-from utils.emailValidation import EmailValidation
-from models.account import Account
+from utils.emailValidation import is_valid_email
+from modelsv2.account_model import Account
 
 
-def register(name, email, password):
+def registerUSer(name, email, password):
     try:
         hashed_password = generate_password_hash(password)
 
-        validatedEmail = EmailValidation(email)
+        validatedEmail = is_valid_email(email)
 
         account = Account(dtFirstName=name, dtEmail=validatedEmail, dtPassword=hashed_password)
         account.save()  # Save the user to the database (implement this based on your ORM)

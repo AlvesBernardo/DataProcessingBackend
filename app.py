@@ -12,12 +12,17 @@ from services.jwt_handler import decode_jwt_token
 from services.auth_guard import check_jwt_token
 from services.makeToken import make_token
 from config.connection_configuration import session, engine
+from flask_sqlalchemy import SQLAlchemy
 
+
+app.config['SQLALCHEMY_DATABASE_URI'] = str(engine.url)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+engine = engine
 db = SQLAlchemy(app)
 
-
 #routes 
-from routes.userRoutes import *
+from routes.userRoutes import logInUser, register, forgotPassword, play_movie, getHowManyTimesMoviePlayed, getHowManyTimesMoviePlayed 
 
 @app.route('/')
 def index():
@@ -50,11 +55,13 @@ def get_subscription(subscription):
         return "User has not selected a subscription yet."
 
 
-app.add_url_rule("login", log_in, method=["POST"])
-app.add_url_rule("/register", register, mehtod=["POST"])
-app.add_url_rule("/forgotPassword", forgotPassword, method=["POST"])
-app.add_url_rule("/getInvitationCode", getInvitationCode, method=["POST"])
-
+app.add_url_rule("/login", view_func=logInUser, methods=["POST"])
+app.add_url_rule("/register", view_func=register, methods=["POST"])
+app.add_url_rule("/forgotPassword", view_func=forgotPassword, methods=["POST"])
+#app.add_url_rule("/getInvitationCode",view_func=getInvitationCode, methods=["POST"])
+app.add_url_rule("/forgotPass", view_func=forgotPassword, methods=["POST"])
+app.add_url_rule("/profile/playMovie",view_func=play_movie, methods=["POST"])
+app.add_url_rule("/profile/getHowManyTimesMoviePlayed", view_func=getHowManyTimesMoviePlayed, methods=["POST"])
 
 
 # Dummy protected route
