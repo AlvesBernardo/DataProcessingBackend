@@ -16,6 +16,7 @@ import logging  # Add this import statement
 from controller.register import registerUser
 app.config['SQLALCHEMY_DATABASE_URI'] = str(engine.url)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)  # Pass the app instance to SQLAlchemy
 
 engine = engine
 db = SQLAlchemy(app)
@@ -62,14 +63,11 @@ def register():
         return response
 
     # Handling actual POST request
-    print("Test")
-    name = request.json.get('name')
+    
     email = request.json.get('email')
     password = request.json.get('password')
-    
     #if we have time, check for duplicate emails
-    print(name)
-    success, message = registerUser(name, email, password)
+    success, message = registerUser(email, password)
 
     try:
         if success:
