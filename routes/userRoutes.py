@@ -2,7 +2,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import sys
 sys.path.append("..") # added!
-from controller.register import registerUSer
 from controller.loginController import logIn
 #from controller.numberGenerator import randomNumberGenerator
 #from models.movie_model import MovieModel
@@ -31,6 +30,7 @@ def logInUser():
                 error_message = 'Invalid credentials'
 
 def register():
+    print("test")
     if request.method == 'POST':
         name = request.json.get('name')
         email = request.json.get('email')

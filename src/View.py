@@ -18,7 +18,7 @@ class View() :
         return self.__movie
     def setMovie(self, movie : Movie) :
         self.__movie = movie
-    def setSubtitleOff() : 
+    def setSubtitleOff(self) :
         self.__subtitle = None
-    def setSubtitleOn(subtitle : Subtitle) :
+    def setSubtitleOn(self,subtitle : Subtitle) :
         self.__subtitle = subtitle

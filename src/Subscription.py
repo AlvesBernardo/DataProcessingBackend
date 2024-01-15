@@ -1,6 +1,6 @@
 import datetime
-from .Quality import Quality
-
+from Quality import Quality
+import QualityTypeEnum
 
 
 class Subscription:
@@ -12,10 +12,10 @@ class Subscription:
     _price = float
 
     def __init__(
-        self, payment, dateOfSignUp, typeOfSubscription, inviteDiscount, sevenDaysFreeTrail, price
+        self, payment : str, dateOfSignUp : datetime.date, typeOfSubscription : QualityTypeEnum.QualityType,
+            inviteDiscount : bool, sevenDaysFreeTrail : bool, price : float
         ):
-         if not isinstance(typeOfSubscription, Quality):
-            raise ValueError("typeOfSubscription must be an instance of Quality or its subclass.")
+
          self._payment = payment
          self.set_dateOfSignUp(dateOfSignUp)          
          self._typeOfSubscription = typeOfSubscription
@@ -92,9 +92,4 @@ class Subscription:
 
 
     def calculate_price(self):
-            if isinstance(self.typeOfSubscription, ShQuality):
-                self._price = 7.99
-            elif isinstance(self.typeOfSubscription, HDQuality):
-                self._price = 10.99
-            elif isinstance(self.typeOfSubscription, UHDQuality):
-                self._price = 13.99
+            self._price += self._typeOfSubscription["price"]
