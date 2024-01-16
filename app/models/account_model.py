@@ -1,6 +1,5 @@
 from flask import Flask
 from ..config.connection_configuration import engine
-from flask_sqlalchemy import SQLAlchemy
 # Creating the SQLAlchemy instance
 from flask_sqlalchemy import SQLAlchemy
 from language_model import Language
