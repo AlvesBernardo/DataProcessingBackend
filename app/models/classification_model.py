@@ -1,7 +1,7 @@
 import sqlite3
 import sqlalchemy
 from sqlalchemy import Table, Column, Integer, String, MetaData
-from ..config.connection_configuration import engine
+from app.config.connection_configuration import engine
 
 
 db = sqlalchemy()

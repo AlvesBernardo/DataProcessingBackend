@@ -2,8 +2,6 @@ from flask import Blueprint, render_template, request, redirect, url_for
 import requests
 import re
 from werkzeug.security import generate_password_hash
-import sys
-sys.path.append("..")
 
 def logIn():        
     email = request.form['email']
