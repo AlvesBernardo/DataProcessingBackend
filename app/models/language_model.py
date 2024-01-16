@@ -2,7 +2,7 @@ import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 import sys
 sys.path.append("..")
-from config.connection_configuration import engine
+from ..config.connection_configuration import engine
 import sqlite3
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
