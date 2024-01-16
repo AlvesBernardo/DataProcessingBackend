@@ -1,14 +1,12 @@
-import sqlite3
-import sqlalchemy
-from sqlalchemy import Table, Column, Integer, String, MetaData
-from ..config.connection_configuration import engine
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 
-db = sqlalchemy()
-meta = MetaData()
-meta.bind = engine
-db.init_app(meta)
 class Classification(db.Model):
+    __tablename__ = 'tblClassification'
     idClassification = db.Column(db.Integer, primary_key=True)
-    dtDescription = db.Column(db.String(50), nullable=False)
+    dtDescription = db.Column(db.String(255), nullable=False)
     
+    def __repr__(self):
+        return '<Quality %r>' % self.idClassification

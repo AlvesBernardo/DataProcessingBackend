@@ -3,9 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Quality(db.Model) : 
-    idQuality = db.Column(db.Integer, primary_key=True)
-    dtQuality = db.Column(db.String)
-    dtDescription = db.Column(db.String)
-    
+    __tablename__ = 'tblQuality'  # Specify the table name
+    idType = db.Column(db.Integer, primary_key=True, nullable=False)  # PK INT NOT NULL
+    dtDescription = db.Column(db.String(50), nullable=False)  # VAR(50) NOT NULL
+    dtPrice = db.Column(db.Float, nullable=False)
+
     def __repr__(self):
-        return '<Quality %r>' % self.idQuality
+        return '<Quality %r>' % self.idType
