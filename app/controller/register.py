@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..") # added!
-from utils.emailValidation import is_valid_email
-from modelsv2.test import Account
+from app.utils.emailValidation import is_valid_email
+from app.models.test import Account
 
 def registerUser(email, password):
     try:

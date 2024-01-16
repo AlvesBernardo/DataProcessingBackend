@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import sessionmaker
-from your_database_module import engine, quality_table
+from app.config.connection_configuration import engine, quality_table
 account_controller = Blueprint('quality', __name__)
 
 ##Only allow select queries while using orm

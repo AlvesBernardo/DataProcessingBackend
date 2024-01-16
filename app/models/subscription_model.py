@@ -1,9 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
-
-class Subscription(db.Model) : 
-    __tablename__ = 'tblSubscription'
+from extensions import db
+class Subcription(db.Model) : 
     idSubscription = db.Column(db.Integer, primary_key=True)
     dtPayment = db.Column(db.String)
     dtDateOfSigUp = db.Column(db.Date)

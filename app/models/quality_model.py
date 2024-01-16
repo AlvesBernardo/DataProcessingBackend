@@ -1,6 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+from extensions import db
 
 class Quality(db.Model) : 
     __tablename__ = 'tblQuality'  # Specify the table name

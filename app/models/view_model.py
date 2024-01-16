@@ -1,7 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-
-db = SQLAlchemy()
+from extensions import db
 
 class View(db.Model) : 
     __tablename__ = 'tblView'  # Specify the table name

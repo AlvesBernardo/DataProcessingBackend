@@ -1,8 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Date
-from sqlalchemy import Time
-
-db = SQLAlchemy()
+from extensions import db
 
 
 class Movie(db.Model) : 

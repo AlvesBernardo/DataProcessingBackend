@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import sessionmaker
-from your_database_module import engine, subscription_table
+from app.config.connection_configuration import engine, subscription_table
 
 
 subscription_controller = Blueprint('subscription', __name__)

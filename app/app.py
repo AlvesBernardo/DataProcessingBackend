@@ -1,6 +1,8 @@
 from flask import Flask
 from config.connection_configuration import engine
-from models.subtitle_model import Subtitle, db
+from services.emailSender import send_email
+from extensions import db
+from models.view_model import View
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = engine.url  # Use the configured database URL
@@ -9,18 +11,19 @@ db.init_app(app)
 
 
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+@app.route('/email')
+def sendingEmail():  # put application's code here
+     send_email('mahdisadeghi.business@gmail.com')
 
 @app.route('/quality')
 def test_connection():
     try:
+
         # Query the first row from the Quality table
-        first_row = Subtitle.query.first()
+        first_row = View.query.first()
         
         if first_row:
-            result = f"First row: {first_row.idSubtitle}, {first_row.fiMovie}"
+            result = f"First row: {first_row.idView}"
         else:
             result = "No records found in dbo.tblQuality"
 

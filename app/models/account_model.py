@@ -1,6 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from extensions import db
 
 class Account(db.Model):
     __tablename__ = 'tblAccount'  # Specify the table name
