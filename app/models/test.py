@@ -1,6 +1,6 @@
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
-
+from app.extensions import db
 class Account(db.Model):
     __tablename__ = 'dbo.tblAccount'
     idAccount = db.Column(db.Integer, primary_key=True)

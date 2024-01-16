@@ -5,8 +5,7 @@ from app.config.connection_configuration import engine
 import sqlite3
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
-db = SQLAlchemy()
+from app.extensions import db
 
 class Language(db.Model):
     __tablename__ = 'dbo.tblLanguage'

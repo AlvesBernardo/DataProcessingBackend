@@ -1,7 +1,6 @@
 import sqlite3
 import sqlalchemy
-
-db = SQLAlchamy()
+from app.extensions import db
 
 class Gerne(object):
     idGerne = db.Column(db.Integer, primary_key=True)

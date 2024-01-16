@@ -2,9 +2,7 @@ import sqlite3
 import sqlalchemy
 from sqlalchemy import Table, Column, Integer, String, MetaData
 from app.config.connection_configuration import engine
-
-
-db = sqlalchemy()
+from app.extensions import db
 meta = MetaData()
 meta.bind = engine
 db.init_app(meta)

@@ -4,7 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 # Creating the SQLAlchemy instance
 from flask_sqlalchemy import SQLAlchemy
 from language_model import Language
-db = SQLAlchemy()
+from app.extensions import db
+
 
 class Account(db.Model):
     __tablename__ = 'dbo.tblAccount'  # Specify the table name

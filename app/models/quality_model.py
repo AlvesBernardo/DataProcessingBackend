@@ -1,7 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
+from app.extensions import db
 class Quality(db.Model) : 
     idQuality = db.Column(db.Integer, primary_key=True)
     dtQuality = db.Column(db.String)

@@ -1,7 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
+from app.extensions import db
 class View(db.Model) : 
     idView = db.Column(db.Integer, primary_key=True)
     dtMovieTime = db.Column(db.Interval, nullable=False )

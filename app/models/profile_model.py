@@ -1,7 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
+from app.extensions import db
 class Profile(db.Model) : 
     idUser = db.Column(db.Integer, primary_key=True)
     dtName = db.Column(db.String)

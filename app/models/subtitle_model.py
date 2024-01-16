@@ -1,7 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
+from app.extensions import db
 class Subtitle(db.Model) : 
     idSubtitle = db.Column(db.Integer, primary_key=True)
     dtLanguage = db.Column(db.String)
