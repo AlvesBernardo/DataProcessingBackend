@@ -1,8 +1,5 @@
 import sqlite3
 import sqlalchemy
-import sys
-sys.path.append("..")
-from ..config.connection_configuration import ConnectionConfiguration
 
 db = SQLAlchamy()
 

@@ -1,7 +1,5 @@
 import sqlite3
 import sqlalchemy
-import sys
-sys.path.append("..")
 from sqlalchemy import Table, Column, Integer, String, MetaData
 from ..config.connection_configuration import engine
 

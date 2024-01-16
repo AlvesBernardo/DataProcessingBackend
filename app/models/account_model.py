@@ -3,7 +3,7 @@ from ..config.connection_configuration import engine
 from flask_sqlalchemy import SQLAlchemy
 # Creating the SQLAlchemy instance
 from flask_sqlalchemy import SQLAlchemy
-from modelsv2.language_model import Language
+from language_model import Language
 db = SQLAlchemy()
 
 class Account(db.Model):
