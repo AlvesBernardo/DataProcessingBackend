@@ -1,5 +1,4 @@
-import sqlite3
-import sqlalchemy
+
 from sqlalchemy import Table, Column, Integer, String, MetaData
 from app.config.connection_configuration import engine
 from app.extensions import db

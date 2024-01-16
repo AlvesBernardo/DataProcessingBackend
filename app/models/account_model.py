@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from language_model import Language
 from app.extensions import db
 
-
 class Account(db.Model):
     __tablename__ = 'dbo.tblAccount'  # Specify the table name
     idAccount = db.Column(db.Integer, primary_key=True)
