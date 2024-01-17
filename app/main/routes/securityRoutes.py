@@ -4,8 +4,8 @@ from flask import Flask, Blueprint, render_template, request, redirect, url_for,
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.account_model import Account
 from itsdangerous import URLSafeTimedSerializer
-import os
-security = Blueprint('user', __name__)
+
+security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
 @security.route('/login', methods=['POST'])
 def login():

@@ -38,4 +38,4 @@ def send_email(receiver_email, subject, body):
 
 
 # Use the function
-send_email("receiver_email@example.com")
+# send_email("receiver_email@example.com")
