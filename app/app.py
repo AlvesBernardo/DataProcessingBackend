@@ -3,7 +3,7 @@ from app.config.connection_configuration import engine
 from app.services.emailSender import send_email
 from app.extensions import db
 from app.models.view_model import View
-from app.main.routes.userRoutes import adminRegister, test_connection
+from app.main.routes.userRoutes import adminRegister, test_connection, getHowManyTimesMoviePlayed
 #from .main.routes.userRoutes import register
 from app import create_app
 app = Flask(__name__)
@@ -15,7 +15,7 @@ app = create_app()
 
 app.register_blueprint(adminRegister)
 app.register_blueprint(test_connection)
-
+# app.register_blueprint(getHowManyTimesMoviePlayed)
 # @app.route('/email')
 # def sendingEmail():  # put application's code here
 #      send_email('mahdisadeghi.business@gmail.com')

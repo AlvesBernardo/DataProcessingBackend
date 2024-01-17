@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for,jsonify
 from app.controller.loginController import logIn
 from app.controller.numberGenerator import randomNumberGenerator
 from app.models.movie_model import Movie
+from app.models.view_model import View
 from app.config.connection_configuration import engine, session
 from app.controller.loginController import logIn
 from app.models.view_model import View
@@ -71,14 +72,14 @@ def forgotPassword():
 def play_movie():
     movie_title = request.form["movie_title"]
     
-    view = session.query(ViewModel).join(MovieModel).filter(MovieModel.c.dtTitle == movie_title).first()
+    view = session.query(View).join(Movie).filter(Movie.c.dtTitle == movie_title).first()
 
     if movie_title not in play_count:
         play_count[movie_title] = 1
     else:
         play_count[movie_title] += 1
 
-    
+
 def getHowManyTimesMoviePlayed(Movie):
     movie_title = request.args.get('movie_title')
 
