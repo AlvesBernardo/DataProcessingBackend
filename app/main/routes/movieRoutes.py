@@ -404,3 +404,5 @@ def play_movie(id) :
 
 @movie_routes.route('/get_times_played/<int:movieId>/<int:userId>')
 def getHowManyTimesMoviePlayed(movieId,userId = None):
+    pass
+
