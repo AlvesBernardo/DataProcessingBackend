@@ -4,7 +4,7 @@ from flask import Flask, Blueprint, render_template, request, redirect, url_for,
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.account_model import Account
 from itsdangerous import URLSafeTimedSerializer
-
+from app.services.jwt_handler import generate_jwt_token
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
 @security.route('/login', methods=['POST'])
@@ -15,14 +15,15 @@ def login():
     :return: Response message with appropriate status code
     """
     data = request.get_json()
-
     if not data or not 'dtEmail' in data or not 'dtPassword' in data:
         return jsonify({'message': 'Bad Request'}), 400
 
     user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
+    print(user.dtEmail)
 
-    if user and check_password_hash(user.dtPassword, data['dtPassword']):
-        return jsonify({'message': 'Logged in successfully'}), 200
+    if user and user.dtPassword == data['dtPassword']:
+        token = generate_jwt_token(payload= data,lifetime=3000)
+        return jsonify({'message': 'Logged in successfully','token' : token}), 200
     else:
         return jsonify({'message': 'Incorrect email or password'}), 401
 
