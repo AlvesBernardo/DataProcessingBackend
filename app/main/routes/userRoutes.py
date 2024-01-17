@@ -28,6 +28,11 @@ play_count = {}
 
 @user.route('/login', methods=['POST'])
 def login():
+    """
+    Authenticate user credentials and allow login.
+
+    :return: Response message with appropriate status code
+    """
     data = request.get_json()
 
     if not data or not 'dtEmail' in data or not 'dtPassword' in data:
@@ -43,6 +48,14 @@ def login():
 
 @user.route('/register', methods=['POST'])
 def register():
+    """
+    Register a new user.
+
+    :return: A JSON response with a success or error message.
+    :rtype: json
+
+    :raises: None
+    """
     data = request.get_json()
 
     if not data or not 'dtEmail' in data or not 'dtPassword' in data:
@@ -66,11 +79,24 @@ def register():
 
 @user.route('/sendEmail')
 def sendingEmail(recieverEmail, subject, body):
+    """
+    Sends an email to the specified receiver email address.
+
+    :param recieverEmail: The email address of the receiver.
+    :param subject: The subject of the email.
+    :param body: The body content of the email.
+    :return: None
+    """
     send_email(recieverEmail, subject, body)
 
 
 @user.route('/forgot-password', methods=['POST'])
 def forgot_password():
+    """
+    Sends a password reset email to the user.
+
+    :return: A JSON response indicating the status of the password reset request.
+    """
     email = request.form.get('dtEmail')
     if not email:
         return jsonify({'message': 'Email is required'}), 400
@@ -92,6 +118,14 @@ def forgot_password():
 
 @user.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
+    """
+    Reset Password
+
+    Resets the password for a user.
+
+    :param token: The token used for password reset.
+    :return: A JSON response with a message indicating the result of the password reset.
+    """
     try:
         email = s.loads(token, salt='email-confirm', max_age=3600)
     except:
@@ -116,6 +150,13 @@ def reset_password(token):
 @user.route('/users', methods=['GET', 'POST'])
 @user.route('/users/<id>', methods=['GET', 'POST', 'DELETE'])
 def manage_users(id=None):
+    """
+    This method `manage_users` handles various HTTP methods and operations related to user management.
+
+    :param id: Optional parameter representing the user ID. If provided, returns details of a specific user. If not provided, returns details of all users.
+    :return: Returns JSON response containing user data or appropriate message.
+
+    """
     if request.method == 'GET':
         if id:
             user = Account.query.get(id)
@@ -180,6 +221,34 @@ def manage_users(id=None):
 @user.route('/subscriptions', methods=['GET', 'POST'])
 @user.route('/subscriptions/<id>', methods=['GET', 'POST', 'DELETE'])
 def manage_subscriptions(id=None):
+    """
+    This function is used to manage subscriptions of a user. It handles HTTP GET, POST, and DELETE request methods for the '/subscriptions' route.
+
+    .. code-block:: python
+
+        @user.route('/subscriptions', methods=['GET', 'POST'])
+        @user.route('/subscriptions/<id>', methods=['GET', 'POST', 'DELETE'])
+        def manage_subscriptions(id=None):
+
+    Parameters:
+        - id (optional): The ID of the subscription to retrieve or delete.
+
+    Returns:
+        - If the request method is GET:
+            - If an ID is provided, it returns the subscription data as a JSON response.
+            - If no ID is provided, it returns all the subscriptions as a JSON response.
+        - If the request method is POST:
+            - It creates a new subscription based on the data provided in the request's JSON payload. Returns a JSON response with a success message.
+        - If the request method is DELETE:
+            - Deletes the subscription with the provided ID. Returns a JSON response with a success message.
+
+    Note:
+        - This function assumes that some external resources (e.g., database) are accessible and used for operations like fetching, creating, and deleting subscriptions.
+        - The code snippet provided here is just an example and may need to be modified to fit your specific application.
+        - The properties to be included in the subscription data should be added or customized as per your requirements.
+        - The route decorators and other framework-specific details are omitted from the docstring for simplicity.
+
+    """
     if request.method == 'GET':
         if id:
             subscription = Subcription.query.get(id)
@@ -230,6 +299,33 @@ def manage_subscriptions(id=None):
 @user.route('/languages', methods=['GET', 'POST'])
 @user.route('/languages/<id>', methods=['GET', 'POST', 'DELETE'])
 def manage_languages(id=None):
+    """
+    This method, `manage_languages`, is used to manage languages in a user API. It handles HTTP GET, POST, and DELETE requests for language resources.
+
+    :param id: An optional parameter specifying the ID of the language to be manipulated. If provided, the method retrieves or deletes a specific language identified by the ID. If not provided
+    *, the method retrieves all languages.
+    :return: The method returns JSON data representing the language(s) depending on the request type.
+
+    **HTTP GET Request**:
+    - If an `id` is provided:
+        - If a language with the specified ID exists, the method retrieves it from the database and returns its details in JSON format.
+        - If no language with the specified ID exists, a JSON response with an error message and HTTP status code 404 (Not Found) is returned.
+    - If no `id` is provided:
+        - All languages stored in the database are retrieved and returned as a list of JSON objects, each representing a language.
+
+    **HTTP POST Request**:
+    - The method expects a JSON payload containing the data required to create a new language instance (e.g., `{'idLanguage': 'eng', 'dtDescription': 'English'}`).
+    - The new language data is saved to the database using SQLAlchemy ORM.
+    - The method returns a JSON response with a success message indicating that the new language has been added.
+
+    **HTTP DELETE Request**:
+    - If an `id` is provided:
+        - If a language with the specified ID exists, it is removed from the database using SQLAlchemy ORM.
+        - If no language with the specified ID exists, a JSON response with an error message and HTTP status code 404 (Not Found) is returned.
+    - The method returns a JSON response with a success message indicating that the language has been deleted.
+
+    **Note**: The method assumes that the Flask application is already set up, and the necessary imports and configurations are in place.
+    """
     if request.method == 'GET':
         if id:
             language = Language.query.get(id)
@@ -279,6 +375,29 @@ def manage_languages(id=None):
 @user.route('/classifications', methods=['GET', 'POST'])
 @user.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_classifications(id=None):
+    """
+    API endpoint for managing classifications.
+
+    :param id: Optional parameter to specify the ID of a specific classification.
+    :return: JSON response with the requested classification(s) information.
+
+    GET method:
+        If `id` is provided, returns the classification information for the specified ID.
+        If `id` is not provided, returns the information for all classifications.
+
+    POST method:
+        Adds a new classification to the database based on the provided JSON data.
+        Returns a JSON response with a success message.
+
+    PUT method:
+        Updates the classification information for the specified ID based on the provided JSON data.
+        Returns a JSON response with a success message.
+
+    DELETE method:
+        Deletes the classification with the specified ID from the database.
+        Returns a JSON response with a success message.
+
+    """
     if request.method == 'GET':
         if id:
             classification = Classification.query.get(id)
@@ -340,6 +459,15 @@ def manage_classifications(id=None):
 @user.route('/genres', methods=['GET', 'POST'])
 @user.route('/genres/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_genres(id=None):
+    """
+    Manage Genres
+
+    Handles various operations related to genres.
+
+    :param id: The ID of the genre to manage. Defaults to None.
+    :return: Returns the result of the operation as JSON.
+
+    """
     if request.method == 'GET':
         if id:
             genre = Genre.query.get(id)
@@ -401,6 +529,12 @@ def manage_genres(id=None):
 @user.route('/movies', methods=['GET', 'POST'])
 @user.route('/movies/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_movies(id=None):
+    """
+    Handles CRUD operations for movies.
+
+    :param id: (int, optional) The ID of the movie to manage.
+    :return: (json) The requested movie data or a list of all movies.
+    """
     if request.method == 'GET':
         if id:
             movie = Movie.query.get(id)
@@ -463,6 +597,12 @@ def manage_movies(id=None):
 @user.route('/profiles', methods=['GET', 'POST'])
 @user.route('/profiles/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_profiles(id=None):
+    """
+    Endpoint for managing profiles.
+
+    :param id: Optional. The id of the profile to manage.
+    :return: JSON response with requested profile data or list of profiles.
+    """
     if request.method == 'GET':
         if id:
             profile = Profile.query.get(id)
@@ -518,6 +658,33 @@ def manage_profiles(id=None):
 @user.route('/qualities', methods=['GET', 'POST'])
 @user.route('/qualities/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_qualities(id=None):
+    """
+    Manage Qualities
+
+    This method manages qualities based on the HTTP request method. It supports GET, POST, PUT, and DELETE operations.
+
+    :param id: The ID of the quality (optional)
+    :return: JSON response with quality data or a message
+
+    GET Method:
+    If an ID is provided, it retrieves the specific quality with the given ID. If no quality is found, a 404 error is returned.
+    If no ID is provided, it retrieves all qualities from the database and returns them as a list of JSON objects.
+
+    POST Method:
+    Creates a new quality using the JSON data provided in the request payload. The new quality is then added to the database.
+    Returns a JSON response with a success message.
+
+    PUT Method:
+    Updates an existing quality with the provided ID. The JSON data in the request payload is used to update the specified attributes of the quality.
+    If no quality is found with the given ID, a 404 error is returned.
+    Returns a JSON response with a success message.
+
+    DELETE Method:
+    Deletes an existing quality with the provided ID.
+    If no quality is found with the given ID, a 404 error is returned.
+    Returns a JSON response with a success message.
+
+    """
     if request.method == 'GET':
         if id:
             quality = Quality.query.get(id)
@@ -581,6 +748,15 @@ def manage_qualities(id=None):
 @user.route('/subtitles', methods=['GET', 'POST'])
 @user.route('/subtitles/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_subtitles(id=None):
+    """
+    Manage subtitles.
+
+    :param id: The ID of the subtitle to manage (optional).
+    :return: If id is provided, returns the details of the specified subtitle.
+             If id is not provided, returns a list of all subtitles.
+    :rtype: JSON
+
+    """
     if request.method == 'GET':
         if id:
             subtitle = Subtitle.query.get(id)
@@ -643,6 +819,10 @@ def manage_subtitles(id=None):
 
 @user.route('/views/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def manage_views(id=None):
+    """
+    :param id: The ID of the view to be managed. If provided, it returns a specific view. If not provided, it returns all views.
+    :return: If id is provided, returns a specific view in JSON format. If id is not provided, returns all views in JSON format.
+    """
     if request.method == 'GET':
         if id:  # if id is provided, return a specific view
             view = View.query.get(id)
