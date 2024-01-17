@@ -1,9 +1,9 @@
-from app.extensions import db
+from extensions import db
 class Subtitle(db.Model) : 
+    __tablename__ = 'tblSubtitle'  # Specify the table name
     idSubtitle = db.Column(db.Integer, primary_key=True)
-    dtLanguage = db.Column(db.String)
-    dtSubtitle = db.Column(db.String)
-    fiMovie = db.Column(db.Integer, db.ForeignKey("movie.idMovie"))
-    
+    fiMovie = db.Column(db.Integer, db.ForeignKey("[dbo].tblMovie.idMovie"))
+    fiLanguage = db.Column(db.Integer, db.ForeignKey("[dbo].tblLanguage.idLanguage"))
+
     def __repr__(self):
-        return '<Subtitle %r>' % self.idSubtitley
+        return '<Subtitle %r>' % self.idSubtitle

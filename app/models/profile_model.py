@@ -1,11 +1,14 @@
-from flask_sqlalchemy import SQLAlchemy
-from app.extensions import db
+
+from extensions import db
+
 class Profile(db.Model) : 
-    idUser = db.Column(db.Integer, primary_key=True)
-    dtName = db.Column(db.String)
-    dtPicture = db.Column(db.String)
-    dtIsMinor = db.Column(db.Boolean)
-    dtLanguage = db.Column(db.String)
-    fiAccount = db.Column(db.Integer, db.ForeignKey("account.idAccount"))
-    fiGenre = db.Column(db.Integer, db.ForeignKey("genre.idGenre"))
-    
+    __tablename__ = 'tblProfile'  # Specify the table name
+    idProfile = db.Column(db.Integer, primary_key=True)
+    dtName = db.Column(db.String(50))
+    dtMinor = db.Column(db.Integer)
+    dtProfileImage = db.Column(db.String(255))
+    fiAccount = db.Column(db.Integer, db.ForeignKey("[dbo].tblAccount.idAccount"))
+    fiGenre = db.Column(db.Integer, db.ForeignKey("[dbo].tblGenre.idGenre"))
+
+    def __repr__(self):
+        return '<View %r>' % self.idProfile
