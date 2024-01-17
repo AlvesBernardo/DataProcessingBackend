@@ -1,5 +1,4 @@
-
-from extensions import db
+from app.extensions import db
 class Subcription(db.Model) : 
     idSubscription = db.Column(db.Integer, primary_key=True)
     dtPayment = db.Column(db.String)

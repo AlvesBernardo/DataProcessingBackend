@@ -1,6 +1,5 @@
 from app.extensions import db
-
-class Movie(db.Model) : 
+class Movie(db.Model) :
     __tablename__ = 'tblMovie'  # Specify the table name
     idMovie = db.Column(db.Integer, primary_key=True)
     dtTitle = db.Column(db.String(255))

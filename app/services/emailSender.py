@@ -9,7 +9,7 @@ api_secret = os.getenv("API_SECRET_KEY_EMAIL_SENDER")
 sender_email = os.getenv("SENDER_EMAIL_ADDRESS")
 
 
-def send_email(receiver_email):
+def send_email(receiver_email, subject, body):
   mailjet = Client(auth=(api_key, api_secret), version='v3.1')
 
   data = {
@@ -25,9 +25,9 @@ def send_email(receiver_email):
             "Name": "Netflix project"
           }
         ],
-        "Subject": "Activating account",
+        "Subject": subject,
         "TextPart": "Greetings from Netflix!",
-        "HTMLPart": "<h3>Your account is activated</h3>"
+        "HTMLPart": body
       }
     ]
   }
