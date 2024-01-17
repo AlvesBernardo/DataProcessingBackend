@@ -165,11 +165,6 @@ def manage_subscriptions(id=None):
 
         return jsonify({'message':'subscription has been deleted'})
 
-def play_movie():
-    movie_title = request.form["movie_title"]
-
-    view = session.query(View).join(Movie).filter(Movie.c.dtTitle == movie_title).first()
-
 @user_route.route('/languages', methods=['GET', 'POST'])
 @user_route.route('/languages/<id>', methods=['GET', 'POST', 'DELETE'])
 def manage_languages(id=None):

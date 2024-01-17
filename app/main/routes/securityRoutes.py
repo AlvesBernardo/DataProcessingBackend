@@ -4,7 +4,7 @@ from flask import Flask, Blueprint, render_template, request, redirect, url_for,
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.account_model import Account
 from itsdangerous import URLSafeTimedSerializer
-
+from app.services.jwt_handler import generate_jwt_token
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
 @security.route('/login', methods=['POST'])
@@ -15,14 +15,15 @@ def login():
     :return: Response message with appropriate status code
     """
     data = request.get_json()
-
     if not data or not 'dtEmail' in data or not 'dtPassword' in data:
         return jsonify({'message': 'Bad Request'}), 400
 
     user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
+    print(user.dtEmail)
 
-    if user and check_password_hash(user.dtPassword, data['dtPassword']):
-        return jsonify({'message': 'Logged in successfully'}), 200
+    if user and user.dtPassword == data['dtPassword']:
+        token = generate_jwt_token(payload= data,lifetime=3000)
+        return jsonify({'message': 'Logged in successfully','token' : token}), 200
     else:
         return jsonify({'message': 'Incorrect email or password'}), 401
 
@@ -38,7 +39,7 @@ def register():
     """
     data = request.get_json()
 
-    if not data or not 'dtEmail' in data or not 'dtPassword' in data:
+    if not data or not 'dtEmail' in data or not 'dtPassword' in data or not 'isAccountBlocked' in data or not 'isAdmin ' or not 'fiSubscription' in data or not 'fiLanguage' in data:
         return jsonify({'message': 'Bad Request'}), 400
 
     user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
@@ -48,7 +49,11 @@ def register():
     else:
         new_user = Account(
             dtEmail=data['dtEmail'],
-            dtPassword=generate_password_hash(data['dtPassword'])
+            dtPassword=generate_password_hash(data['dtPassword']),
+            isAccountBlocked=bool( data['isAccountBlocked']),
+            dtIsAdmin =bool(data['isAdmin']),
+            fiSubscription = 1,
+            fiLanguage = 1
         )
 
         db.session.add(new_user)

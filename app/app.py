@@ -7,6 +7,7 @@ from app.main.routes.movieRoutes import movie_routes
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = engine.url  # Use the configured database URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ECHO'] = True
 db.init_app(app)
 app.register_blueprint(user_route)
 app.register_blueprint(security)

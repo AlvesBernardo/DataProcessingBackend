@@ -3,7 +3,7 @@ import sys
 import urllib.parse
 # Load environment variables from .env file
 sys.path.append("..") # added!
-from services.jwt_handler import decode_jwt_token
+from jwt_handler import decode_jwt_token
 import base64
 
 

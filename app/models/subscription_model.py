@@ -1,5 +1,6 @@
 from app.extensions import db
-class Subcription(db.Model) : 
+class Subcription(db.Model) :
+    __tablename__ = 'tblSubscription'
     idSubscription = db.Column(db.Integer, primary_key=True)
     dtPayment = db.Column(db.String)
     dtDateOfSigUp = db.Column(db.Date)
