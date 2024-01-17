@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for,jsonify
 from app.controller.loginController import logIn
 from app.controller.numberGenerator import randomNumberGenerator
-from app.models.movie_model import MovieModel
+from app.models.movie_model import Movie
 from app.config.connection_configuration import engine, session
 
 user_routes_bp = Blueprint('user_routes', __name__)

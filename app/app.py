@@ -1,8 +1,8 @@
 from flask import Flask
-from config.connection_configuration import engine
-from services.emailSender import send_email
-from extensions import db
-from models.view_model import View
+from .config.connection_configuration import engine
+from .services.emailSender import send_email
+from .extensions import db
+from .models.view_model import View
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = engine.url  # Use the configured database URL
