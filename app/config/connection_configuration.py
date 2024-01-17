@@ -10,6 +10,8 @@ server_name = "dataprocessing-sbmr.database.windows.net"
 database_name = "dataprocessing-sbmr"
 username = os.getenv("DATABASE_USERNAME")
 password = os.getenv("DATABASE_PASSWORD")
+print(username, password)
+
 
 # SQL Server connection URL formatting
 connection_url = f"mssql+pyodbc://{username}:{password}@{server_name}/{database_name}?driver=ODBC+Driver+17+for+SQL+Server"

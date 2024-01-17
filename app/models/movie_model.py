@@ -1,5 +1,4 @@
-from extensions import db
-
+from app.extensions import db
 
 class Movie(db.Model) : 
     __tablename__ = 'tblMovie'  # Specify the table name

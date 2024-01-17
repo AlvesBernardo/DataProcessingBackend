@@ -1,4 +1,4 @@
-from extensions import db
+from app.extensions import db
 class Subtitle(db.Model) : 
     __tablename__ = 'tblSubtitle'  # Specify the table name
     idSubtitle = db.Column(db.Integer, primary_key=True)

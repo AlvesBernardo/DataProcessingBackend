@@ -1,4 +1,4 @@
-from extensions import db
+from ..extensions import db
 
 class View(db.Model) : 
     __tablename__ = 'tblView'  # Specify the table name
