@@ -1,5 +1,4 @@
 from app.extensions import db
-
 class View(db.Model) : 
     __tablename__ = 'tblView'  # Specify the table name
     idView = db.Column(db.Integer, primary_key=True)

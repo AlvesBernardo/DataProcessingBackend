@@ -4,6 +4,8 @@ from app.controller.loginController import logIn
 from app.controller.numberGenerator import randomNumberGenerator
 from app.models.movie_model import Movie
 from app.config.connection_configuration import engine, session
+from app.controller.loginController import logIn
+from app.models.view_model import View
 
 user_routes_bp = Blueprint('user_routes', __name__)
 play_count = {}
@@ -21,7 +23,10 @@ def logInUser():
                 return redirect(url_for('user_routes.success'))
             else:
                 error_message = 'Invalid credentials'
-def register():
+
+
+@user_routes_bp.route('/register', methods=['POST'])
+def adminRegister():
     print("test")
     if request.method == 'POST':
         name = request.json.get('name')
@@ -101,3 +106,21 @@ def forgotPass():
                 error_message = 'Invalid credentials'
 
     return render_template('forgotPass.html', error_message=error_message)
+
+
+@user_routes_bp.route('/quality')
+def test_connection():
+    try:
+
+        # Query the first row from the Quality table
+        first_row = View.query.first()
+        
+        if first_row:
+            result = f"First row: {first_row.idView}"
+        else:
+            result = "No records found in dbo.tblQuality"
+
+        return result
+
+    except Exception as e:
+        return f"Error: {e}"

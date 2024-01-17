@@ -1,4 +1,5 @@
 
+
 from app.extensions import db
 class Account(db.Model):
     __tablename__ = 'tblAccount'  # Specify the table name
