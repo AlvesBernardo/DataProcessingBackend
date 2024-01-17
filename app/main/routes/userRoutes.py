@@ -245,10 +245,6 @@ def manage_languages(id=None):
 
         return jsonify({'message': 'language has been deleted'})
 
-
-
-def getHowManyTimesMoviePlayed(Movie):
-    movie_title = request.args.get('movie_title')
 @user_route.route('/profiles', methods=['GET', 'POST'])
 @user_route.route('/profiles/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_profiles(id=None):

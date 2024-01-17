@@ -6,9 +6,10 @@ from app.models.genre_model import Genre
 from app.models.movie_model import Movie
 from app.models.quality_model import Quality
 from app.models.subtitle_model import Subtitle
-
+from app.models.view_model import View
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
+play_count = {}
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_classifications(id=None):
@@ -389,3 +390,17 @@ def manage_subtitles(id=None):
         db.session.commit()
 
         return jsonify({'message':'Subtitle has been deleted'})
+@movie_routes.route('/play_movie/<int:id>/')
+def play_movie(id) :
+    view = db.session.query(View).join(Movie,id == View.idView).filter(Movie.idMovie == id).first()
+
+    # view = session.query(ViewModel).join(MovieModel).filter(MovieModel.c.dtTitle == movie_title).first()
+
+    # if movie_title not in play_count:
+    #     play_count[movie_title] = 1
+    # else:
+    #     play_count[movie_title] += 1
+
+
+@movie_routes.route('/get_times_played/<int:movieId>/<int:userId>')
+def getHowManyTimesMoviePlayed(movieId,userId = None):
