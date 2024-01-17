@@ -1,5 +1,4 @@
-
-from extensions import db
+from app.extensions import db
 
 class Quality(db.Model) : 
     __tablename__ = 'tblQuality'  # Specify the table name

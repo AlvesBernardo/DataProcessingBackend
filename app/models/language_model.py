@@ -1,5 +1,4 @@
-from extensions import db
-
+from app.extensions import db
 class Language(db.Model):
     __tablename__ = 'tblLanguage'
     idLanguage = db.Column(db.Integer, primary_key=True)
