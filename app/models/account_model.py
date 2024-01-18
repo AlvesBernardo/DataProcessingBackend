@@ -12,7 +12,6 @@ class Account(db.Model):
     fiSubscription = db.Column(db.Integer, db.ForeignKey("tblSubscription.idSubscription"))  # Adjust the ForeignKey
     subscription = relationship("Subcription")  # This should match the class name of the related model
     fiLanguage = db.Column(db.Integer, db.ForeignKey("tblLanguage.idLanguage"))
-
     language = relationship("Language")
     def repr(self):  # Use double underscores for special method
         return '<Account %r>' % self.idAccount

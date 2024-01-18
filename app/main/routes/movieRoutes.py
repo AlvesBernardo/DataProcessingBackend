@@ -7,11 +7,13 @@ from app.models.movie_model import Movie
 from app.models.quality_model import Quality
 from app.models.subtitle_model import Subtitle
 from app.models.view_model import View
+from app.services.auth_guard import auth_guard
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard('admin')
 def manage_classifications(id=None):
     """
     API endpoint for managing classifications.
@@ -188,6 +190,7 @@ def manage_movies(id=None):
                 'dtMinAge': movie.dtMinAge,
                 'fiType': movie.fiType,
                 'fiGenre': movie.fiGenre,
+                'fiClassification': movie.fiClassification,
                 'fiLanguage': movie.fiLanguage
             }
             return jsonify(movie_data)

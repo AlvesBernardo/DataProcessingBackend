@@ -13,8 +13,8 @@ def generate_jwt_token(payload,lifetime=None):
     if lifetime:
       payload["exp"] = (datetime.now() + timedelta(minutes=lifetime)).timestamp()
 
-    #return jwt.encode(payload, os.environ.get('SECRET_KEY', algorithm="HS256"))
-    encoded = jwt.encode({"some": "payload", "exp": 1},os.environ.get("SECRET_KEY"), algorithm="HS256")
-    return encoded
+    return jwt.encode(payload, os.environ.get('SECRET_KEY' ),algorithm="HS256")
+    # encoded = jwt.encode({"some": "payload", "exp": 1},os.environ.get("SECRET_KEY"), algorithm="HS256")
+    # return encoded
 def decode_jwt_token(token):
     return jwt.decode(token, os.environ.get('SECRET_KEY'), algorithms=["HS256"])

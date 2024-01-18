@@ -19,10 +19,14 @@ def login():
         return jsonify({'message': 'Bad Request'}), 400
 
     user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
-    print(user.dtEmail)
+    if user and  check_password_hash(user.dtPassword,data['dtPassword']):
+        user_info =  {"idAccount" : user.idAccount ,"dtEmail" : data['dtEmail']}
+        if (user.dtIsAdmin == 0) :
+            user_info["roles"] = "user"
+        else :
+            user_info["roles"] = "admin"
+        token = generate_jwt_token(payload= user_info,lifetime=3000)
 
-    if user and user.dtPassword == data['dtPassword']:
-        token = generate_jwt_token(payload= data,lifetime=3000)
         return jsonify({'message': 'Logged in successfully','token' : token}), 200
     else:
         return jsonify({'message': 'Incorrect email or password'}), 401

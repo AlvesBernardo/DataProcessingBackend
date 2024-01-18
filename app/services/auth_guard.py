@@ -2,8 +2,7 @@ from flask import request, jsonify
 import sys
 import urllib.parse
 # Load environment variables from .env file
-sys.path.append("..") # added!
-from jwt_handler import decode_jwt_token
+from .jwt_handler import decode_jwt_token
 import base64
 
 
@@ -26,15 +25,21 @@ def check_jwt_token(token=None):
     except Exception as e:
         raise Exception(f'Invalid access token: {e}')
 
-def auth_guard(route_function):
-    def decorated_function(*args, **kwargs):
-        # Authentication gate
-        try:
-            user_data = check_jwt_token()
-        except Exception as e:
-             return jsonify({"message": f'{e}', "status": 401}), 401
-        return route_function(*args, **kwargs)
+def auth_guard(role = None ):
+
+    def wrapper(route_function) :
+        def decorated_function(*args, **kwargs):
+            # Authentication gate
+            try:
+                user_data = check_jwt_token()
+            except Exception as e:
+                return jsonify({"message": f'{e}', "status": 401}), 401
+            if role and role not in user_data['roles'] :
+                return jsonify({"message" : 'Authorization required.', "status" : 403}),403
+            return route_function(*args, **kwargs)
         
-    decorated_function.__name__ = route_function.__name__
-    return decorated_function
+        decorated_function.__name__ = route_function.__name__
+        return decorated_function
+    return wrapper
+
      
