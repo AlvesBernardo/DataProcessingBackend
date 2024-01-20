@@ -78,13 +78,12 @@ def manage_users(id=None):
 
     elif request.method == 'DELETE':
         user = Account.query.get(id)
-        if not user:
-            return jsonify({'message': 'No user found!'}), 404
+        error_message = call_stored_procedure_post("EXEC dbo.DeleteAccountAndRelatedContent @AccountID = ? ",(id,))
+        if error_message == []:
+            return jsonify({'message': 'account deleted'})
+        else:
+            return jsonify({'message': 'account could not be deleted', 'error_message': error_message})
 
-        db.session.delete(user)
-        db.session.commit()
-
-        return jsonify({'message': 'user has been deleted'})
 
 
 @user_route.route('/subscriptions', methods=['GET', 'POST'])
@@ -147,11 +146,17 @@ def manage_subscriptions(id=None):
     elif request.method == 'POST':
         data = request.get_json()
         # Here you'd typically validate the data format and parameters
-        new_subscription = Subcription(**data)
-
-        db.session.add(new_subscription)
-        db.session.commit()
-
+        data = request.get_json()
+        new_profile_data = (data['Payment'], data['DateOfSignUp'],data['QualityType'])
+        end_message = call_stored_procedure_post("""InsertSubscription
+                                                                                    @Payment = ?,
+                                                                                    @DateOfSignUp = ?,
+                                                                                    @QualityType = ? 
+                                                                                    """, new_profile_data)
+        if end_message == []:
+            return jsonify({'message': 'new quality added'})
+        else:
+            return jsonify({'message': 'quality could not be added', 'error_message': end_message})
         return jsonify({'message':'new subscription added'})
 
     elif request.method == 'DELETE':
@@ -355,11 +360,17 @@ def manage_views(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        # Here you'd typically validate the data format and parameters
-        new_view = View(**data)
-        new_view.dtMovieTime = datetime.datetime.strptime(data['dtMovieTime'], "%Y-%m-%dT%H:%M:%S")
-
-        db.session.add(new_view)
+        new_profile_data = (data['SubtitleID'], data['MovieID'],data['ProfileID'],data["MovieTime"])
+        end_message = call_stored_procedure_post("""InsertView
+                                                                                    @SubtitleID = ?,
+                                                                                    @MovieID = ? ,
+                                                                                    @ProfileID = ? ,
+                                                                                    @MovieTime = ? 
+                                                                                    """, new_profile_data)
+        if end_message == []:
+            return jsonify({'message': 'new view added'})
+        else:
+            return jsonify({'message': 'view could not be added', 'error_message': end_message})
         db.session.commit()
 
         return jsonify({'message': 'new view added'})

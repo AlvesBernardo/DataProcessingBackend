@@ -234,6 +234,12 @@ def manage_movies(id=None):
 
         # update attributes
         movie.dtTitle = data.get('dtTitle', movie.dtTitle)
+    elif request.method == 'DELETE' :
+        end_message = call_stored_procedure_post("DeleteMovieAndRelatedContent @MovieID = ? ", (id,))
+        if end_message == []:
+            return jsonify({'message': 'movie deleted'})
+        else:
+            return jsonify({'message': 'movie could not be deleted', 'error_message': end_message})
 @movie_routes.route('/qualities', methods=['GET', 'POST'])
 @movie_routes.route('/qualities/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_qualities(id=None):
