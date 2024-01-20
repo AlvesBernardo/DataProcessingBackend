@@ -14,6 +14,7 @@ from app.models.subscription_model import Subcription
 from app.models.subtitle_model import Subtitle
 from app.models.view_model import View
 import datetime
+from app.extensions import call_stored_procedure_post ,call_stored_procedure_get
 user_route = Blueprint('user', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
@@ -63,19 +64,17 @@ def manage_users(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_user = Account(
-            dtEmail=data['dtEmail'],
-            dtPassword=generate_password_hash(data['dtPassword']),
-            isAccountBlocked=data.get('isAccountBlocked', False),
-            dtIsAdmin=data.get('dtIsAdmin', False),
-            fiSubscription=data.get('fiSubscription'),
-            fiLanguage=data.get('fiLanguage')
-        )
 
-        db.session.add(new_user)
-        db.session.commit()
-
-        return jsonify({'message': 'new user added'})
+        new_classification_data = (data['dtEmail'],data['dtPassword'],data['fiSubscription'],data['fiLanguage'])
+        end_message = call_stored_procedure_post("""InsertAccount
+                                                            @dtEmail = ? ,
+                                                            @dtPassword = ? ,
+                                                            @fiSubscription = ? , 
+                                                            @fiLanguage = ? """, new_classification_data)
+        if end_message == []:
+            return jsonify({'message': 'new account added'})
+        else:
+            return jsonify({'message': 'account could not be added', 'error_message': end_message})
 
     elif request.method == 'DELETE':
         user = Account.query.get(id)
@@ -223,12 +222,17 @@ def manage_languages(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_language = Language(**data)
+        new_subscription_data = (data['dtDescription'])
+        end_message = call_stored_procedure_post("""InsertLanguage
+                                                            @dtDescription = ?
+                                                            
+                                                        """,
+                                                 new_subscription_data)
+        if end_message == []:
+            return jsonify({'message': 'new Language added'})
+        else:
+            return jsonify({'message': 'Language could not be added', 'error_message': end_message})
 
-        db.session.add(new_language)
-        db.session.commit()
-
-        return jsonify({'message': 'new language added'})
 
     elif request.method == 'DELETE':
         language = Language.query.get(id)
@@ -283,12 +287,20 @@ def manage_profiles(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_profile = Profile(**data)
-
-        db.session.add(new_profile)
-        db.session.commit()
-
-        return jsonify({'message':'new profile added'})
+        new_language_data = (data['Name'],data['IsMinor'],data['ProfileImage'],data['IsAccountDisabled'],data['AccountID'],data['Genre']
+                             )
+        end_message = call_stored_procedure_post("""InsertProfile
+                                                                            @Name = ? ,
+                                                                            @IsMinor = ?,
+                                                                            @ProfileImage = ?,
+                                                                            @IsAccountDisabled = ? ,
+                                                                            @AccountID = ? , 
+                                                                            @Genre = ? 
+                                                                            """, new_language_data)
+        if end_message == []:
+            return jsonify({'message': 'new profile added'})
+        else:
+            return jsonify({'message': 'profile could not be added', 'error_message': end_message})
 
     elif request.method == 'PUT':
         data = request.get_json()
@@ -304,6 +316,7 @@ def manage_profiles(id=None):
 
 
 
+@user_route.route('/views',methods = ['GET','POST'])
 @user_route.route('/views/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def manage_views(id=None):
     """
@@ -373,6 +386,8 @@ def manage_views(id=None):
         view = View.query.get(id)
         if not view:
             return jsonify({'message': 'No View found!'})
+
+
 
 
 
