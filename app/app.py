@@ -1,11 +1,9 @@
 from .extensions import db
-
 from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify
 from app.config.connection_configuration import engine, session
 from app.main.routes.securityRoutes import security
 from app.main.routes.userRoutes import user_route
 from app.main.routes.movieRoutes import movie_routes
-from sqlalchemy import text
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = engine.url  # Use the configured database URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
