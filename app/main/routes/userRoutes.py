@@ -75,10 +75,10 @@ def manage_users(id=None):
             return jsonify({'message': 'new account added'})
         else:
             return jsonify({'message': 'account could not be added', 'error_message': end_message})
-
+    # Throws an error even if it works
     elif request.method == 'DELETE':
         user = Account.query.get(id)
-        error_message = call_stored_procedure_post("EXEC dbo.DeleteAccountAndRelatedContent @AccountID = ? ",(id,))
+        error_message = call_stored_procedure_post("DeleteAccountAndRelatedContent @AccountID = ? ",(id,))
         if error_message == []:
             return jsonify({'message': 'account deleted'})
         else:
