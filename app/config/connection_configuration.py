@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 load_dotenv()
 server_name = "dataprocessing-sbmr.database.windows.net"
-database_name = "dataprocessing-sbmr"
+database_name = "dataprocessing-sbmr_2024-01-18T16-57Z"
 username = os.getenv("DATABASE_USERNAME")
 password = os.getenv("DATABASE_PASSWORD")
 print(username, password)

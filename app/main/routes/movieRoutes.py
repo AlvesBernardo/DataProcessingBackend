@@ -1,4 +1,5 @@
 from app.extensions import db
+from app.extensions import call_stored_procedure_get , call_stored_procedure_post
 from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify
 from itsdangerous import URLSafeTimedSerializer
 from app.models.classification_model import Classification
@@ -7,13 +8,15 @@ from app.models.movie_model import Movie
 from app.models.quality_model import Quality
 from app.models.subtitle_model import Subtitle
 from app.models.view_model import View
-from app.services.auth_guard import auth_guard
+import datetime
+from dateutil.parser import parse
+from app.services.auth_guard import auth_guard,check_jwt_token
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
-@auth_guard('admin')
+# @auth_guard('admin')
 def manage_classifications(id=None):
     """
     API endpoint for managing classifications.
@@ -66,13 +69,13 @@ def manage_classifications(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_classification = Classification(**data)
-
-        db.session.add(new_classification)
-        db.session.commit()
-
-        return jsonify({'message':'new classification added'})
-
+        new_classification_data = (data['dtDescription'],)
+        end_message = call_stored_procedure_post("""InsertClassification 
+                                                    @dtDescription = ? """, new_classification_data)
+        if end_message == []:
+            return jsonify({'message':'new classification added'})
+        else :
+            return jsonify({'message': 'user could not be added', 'error_message': end_message})
     elif request.method == 'PUT':
         data = request.get_json()
         classification = Classification.query.get(id)
@@ -137,11 +140,13 @@ def manage_genres(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_genre = Genre(**data)
-
-        db.session.add(new_genre)
-        db.session.commit()
-
+        new_genre_data = (data['genreDescription'],)
+        end_message = call_stored_procedure_post("""InsertGenre
+                                                            @GenreDescription = ? """, new_genre_data)
+        if end_message == []:
+            return jsonify({'message': 'new genre added'})
+        else:
+            return jsonify({'message': 'genre could not be added', 'error_message': end_message})
         return jsonify({'message':'new genre added'})
 
     elif request.method == 'PUT':
@@ -196,35 +201,30 @@ def manage_movies(id=None):
             return jsonify(movie_data)
 
         else:
-            movies = Movie.query.all()
-            output = []
-
-            for movie in movies:
-                movie_data = {
-                    'idMovie': movie.idMovie,
-                    'dtTitle': movie.dtTitle,
-                    'dtYear': movie.dtYear,
-                    'dtAmountOfEp': movie.dtAmountOfEp,
-                    'dtAmountOfSeasons': movie.dtAmountOfSeasons,
-                    'dtLength': str(movie.dtLength),
-                    'dtMinAge': movie.dtMinAge,
-                    'fiType': movie.fiType,
-                    'fiGenre': movie.fiGenre,
-                    'fiLanguage': movie.fiLanguage
-                }
-                output.append(movie_data)
-
-            return jsonify({'movies': output})
+            movies = call_stored_procedure_get(procedure_name="GetAllMovies")
+            return jsonify({'movies': movies})
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_movie = Movie(**data)
-
-        db.session.add(new_movie)
-        db.session.commit()
-
-        return jsonify({'message': 'new movie added'})
-
+        new_language_data = (data['dtTitle'], parse(data['dtYear']),data['dtAmountOfEP'],data['dtAmountOfSeasons'],
+                             parse(data['dtLength']) ,
+                             data['dtMinAge'],data['fiType'],data['fiLanguage'],data['fiClassification'],data['fiGenre'],)
+        end_message = call_stored_procedure_post("""InsertNewMovie 
+                                                                    @dtTitle = ? ,
+                                                                    @dtYear = ? ,
+                                                                    @dtAmountOfEp = ?,
+                                                                    @dtAmountOfSeasons = ? ,
+                                                                    @dtLength = ? ,
+                                                                    @dtMinAge = ? , 
+                                                                    @fiType = ? ,
+                                                                    @fiLanguage = ?,
+                                                                    @fiClassification = ?,
+                                                                    @fiGenre = ? 
+                                                                    """, new_language_data)
+        if end_message == []:
+            return jsonify({'message': 'new movie added'})
+        else:
+            return jsonify({'message': 'movie could not be added', 'error_message': end_message})
     elif request.method == 'PUT':
         data = request.get_json()
         movie = Movie.query.get(id)
@@ -292,13 +292,15 @@ def manage_qualities(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_quality = Quality(**data)
-
-        db.session.add(new_quality)
-        db.session.commit()
-
-        return jsonify({'message':'new quality added'})
-
+        new_profile_data  =  (data['dtDescription'],data['dtPrice'])
+        end_message = call_stored_procedure_post("""InsertQuality
+                                                                            @dtDescription = ?,
+                                                                            @dtPrice = ?
+                                                                            """, new_profile_data)
+        if end_message == []:
+            return jsonify({'message': 'new quality added'})
+        else:
+            return jsonify({'message': 'quality could not be added', 'error_message': end_message})
     elif request.method == 'PUT':
         data = request.get_json()
         quality = Quality.query.get(id)
@@ -348,27 +350,23 @@ def manage_subtitles(id=None):
             return jsonify(subtitle_data)
 
         else:
-            subtitles = Subtitle.query.all()
-            output = []
+            subtitles = call_stored_procedure_get("GetAllSubtitles")
 
-            for subtitle in subtitles:
-                subtitle_data = {
-                    'idSubtitle': subtitle.idSubtitle,
-                    'fiMovie': subtitle.fiMovie,
-                    'fiLanguage': subtitle.fiLanguage
-                }
-                output.append(subtitle_data)
-
-            return jsonify({'subtitles': output})
+            return jsonify({'subtitles': subtitles})
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_subtitle = Subtitle(**data)
 
-        db.session.add(new_subtitle)
-        db.session.commit()
-
-        return jsonify({'message':'new subtitle added'})
+        new_subscription_data = (data['fiMovie'],data['fiLanguage'])
+        end_message = call_stored_procedure_post("""InsertSubtitle
+                                                    @fiMovie = ?,
+                                                    @fiLanguage = ?
+                                                """,
+                                                 new_subscription_data)
+        if end_message == []:
+            return jsonify({'message': 'new Subtitle added'})
+        else:
+            return jsonify({'message': 'Subtitle could not be added', 'error_message': end_message})
 
     elif request.method == 'PUT':
         data = request.get_json()
@@ -394,8 +392,13 @@ def manage_subtitles(id=None):
 
         return jsonify({'message':'Subtitle has been deleted'})
 @movie_routes.route('/play_movie/<int:id>/')
+@auth_guard('user')
 def play_movie(id) :
     view = db.session.query(View).join(Movie,id == View.idView).filter(Movie.idMovie == id).first()
+    try :
+        decoded_token = check_jwt_token()
+    except Exception as e:
+        return jsonify({'message' : e})
 
     # view = session.query(ViewModel).join(MovieModel).filter(MovieModel.c.dtTitle == movie_title).first()
 
@@ -406,6 +409,7 @@ def play_movie(id) :
 
 
 @movie_routes.route('/get_times_played/<int:movieId>/<int:userId>')
+@auth_guard('user')
 def getHowManyTimesMoviePlayed(movieId,userId = None):
     pass
 

@@ -1,4 +1,4 @@
-from app.extensions import db
+from app.extensions import db,call_stored_procedure_get,call_stored_procedure_post
 from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify
 from app.config.connection_configuration import engine, session
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,6 +14,7 @@ from app.models.subscription_model import Subcription
 from app.models.subtitle_model import Subtitle
 from app.models.view_model import View
 import datetime
+from dateutil.parser import parse
 user_route = Blueprint('user', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
@@ -63,19 +64,17 @@ def manage_users(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_user = Account(
-            dtEmail=data['dtEmail'],
-            dtPassword=generate_password_hash(data['dtPassword']),
-            isAccountBlocked=data.get('isAccountBlocked', False),
-            dtIsAdmin=data.get('dtIsAdmin', False),
-            fiSubscription=data.get('fiSubscription'),
-            fiLanguage=data.get('fiLanguage')
-        )
+        newAccount = (data['dtEmail'],data['dtPassword'],data['fiSubscription'],data['fiLanguage'])
+        end_message = call_stored_procedure_post("""InsertAccount
+            @dtEmail = ?, 
+            @dtPassword = ?, 
+            @fiSubscription = ?, 
+            @fiLanguage = ?""",newAccount)
 
-        db.session.add(new_user)
-        db.session.commit()
-
-        return jsonify({'message': 'new user added'})
+        if end_message == None :
+            return jsonify({'message': 'new user added'})
+        else :
+            return jsonify({'message' : 'user could not be added', 'error_message' : end_message})
 
     elif request.method == 'DELETE':
         user = Account.query.get(id)
@@ -147,12 +146,16 @@ def manage_subscriptions(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        # Here you'd typically validate the data format and parameters
-        new_subscription = Subcription(**data)
 
-        db.session.add(new_subscription)
-        db.session.commit()
-
+        new_subscription_data = (data['Payment'],parse(data['DateOfSignUp']),data['QualityType'])
+        end_message = call_stored_procedure_post("""InsertSubscription
+                                                                                    @Payment = ?,
+                                                                                    @DateOfSignUp = ?,
+                                                                                    @QualityType = ? """, new_subscription_data)
+        if end_message == []:
+            return jsonify({'message': 'new Subscription added'})
+        else:
+            return jsonify({'message': 'Subscription could not be added', 'error_message': end_message})
         return jsonify({'message':'new subscription added'})
 
     elif request.method == 'DELETE':
@@ -223,12 +226,13 @@ def manage_languages(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_language = Language(**data)
-
-        db.session.add(new_language)
-        db.session.commit()
-
-        return jsonify({'message': 'new language added'})
+        new_language_data = (data['dtDescription'],)
+        end_message = call_stored_procedure_post("""InsertClassification 
+                                                            @dtDescription = ? """, new_language_data)
+        if end_message == []:
+            return jsonify({'message': 'new language added'})
+        else:
+            return jsonify({'message': 'language could not be added', 'error_message': end_message})
 
     elif request.method == 'DELETE':
         language = Language.query.get(id)
@@ -283,12 +287,18 @@ def manage_profiles(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_profile = Profile(**data)
-
-        db.session.add(new_profile)
-        db.session.commit()
-
-        return jsonify({'message':'new profile added'})
+        new_profile_data = (data['Name'],data['IsMinor'],data['ProfileImage'],data['IsAccountDisabled'],data['AccountID'],data['Genre'])
+        end_message = call_stored_procedure_post("""InsertProfile
+                                                                    @Name = ?,
+                                                                    @IsMinor = ?,
+                                                                    @ProfileImage = ?,
+                                                                    @IsAccountDisabled = ?,
+                                                                    @AccountID = ?,
+                                                                    @Genre = ?""", new_profile_data)
+        if end_message == []:
+            return jsonify({'message': 'new profile added'})
+        else:
+            return jsonify({'message': 'profile could not be added', 'error_message': end_message})
 
     elif request.method == 'PUT':
         data = request.get_json()
@@ -303,7 +313,7 @@ def manage_profiles(id=None):
 
 
 
-
+@user_route.route('/views',methods = ['GET','POST'])
 @user_route.route('/views/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def manage_views(id=None):
     """
@@ -342,14 +352,19 @@ def manage_views(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        # Here you'd typically validate the data format and parameters
-        new_view = View(**data)
-        new_view.dtMovieTime = datetime.datetime.strptime(data['dtMovieTime'], "%Y-%m-%dT%H:%M:%S")
 
-        db.session.add(new_view)
-        db.session.commit()
-
-        return jsonify({'message': 'new view added'})
+        new_subscription_data = (parse( data['MovieTime']),data['SubtitleID'],data['MovieID'], data['ProfileID'])
+        end_message = call_stored_procedure_post("""InsertView
+                                                            @MovieTime = ?,
+                                                            @SubtitleID = ?,
+                                                            @MovieID = ?,
+                                                            @ProfileID = ?
+                                                        """,
+                                                 new_subscription_data)
+        if end_message == []:
+            return jsonify({'message': 'new View added'})
+        else:
+            return jsonify({'message': 'View could not be added', 'error_message': end_message})
 
     elif request.method == 'PUT':
         data = request.get_json()
