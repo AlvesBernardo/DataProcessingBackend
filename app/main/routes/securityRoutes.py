@@ -26,12 +26,12 @@ def login():
 
     user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
     if user:
-        if user.isAccountBlocked and user.blocked_until and user.blocked_until > datetime.now(timezone.utc):
+        if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(timezone.utc):
             return jsonify(
                 {"message": "Your account has been blocked for 1 hour due to too many failed login attempts"}), 403
 
         if check_password_hash(user.dtPassword, data['dtPassword']):
-            user.failed_login_attempts = 0
+            user.dtFailedLoginAttemps = 0
 
             user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
             if user.dtIsAdmin == 0:
@@ -44,11 +44,11 @@ def login():
 
             return jsonify({'message': 'Logged in successfully', 'token': token}), 200
         else:
-            user.failed_login_attempts += 1
+            user.dtFailedLoginAttemps += 1
 
-            if user.failed_login_attempts >= 3:
+            if user.dtFailedLoginAttemps >= 3:
                 user.isAccountBlocked = True
-                user.blocked_until = datetime.now(timezone.utc) + timedelta(minutes=60)
+                user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
 
             db.session.commit()
 
