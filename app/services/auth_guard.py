@@ -27,15 +27,18 @@ def check_jwt_token(token=None):
 
 def auth_guard(role = None ):
 
-    def wrapper(route_function) :
+    def wrapper(route_function):
         def decorated_function(*args, **kwargs):
             # Authentication gate
             try:
                 user_data = check_jwt_token()
             except Exception as e:
                 return jsonify({"message": f'{e}', "status": 401}), 401
-            if role and role not in user_data['roles'] :
-                return jsonify({"message" : 'Authorization required.', "status" : 403}),403
+
+            user_role = user_data.get('roles', '')
+            if role and not (user_role == "user" or user_role == 'admin'):
+                return jsonify({"message": 'Authorization required.', "status": 403}), 403
+
             return route_function(*args, **kwargs)
         
         decorated_function.__name__ = route_function.__name__

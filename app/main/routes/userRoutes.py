@@ -371,10 +371,6 @@ def manage_views(id=None):
             return jsonify({'message': 'new view added'})
         else:
             return jsonify({'message': 'view could not be added', 'error_message': end_message})
-        db.session.commit()
-
-        return jsonify({'message': 'new view added'})
-
     elif request.method == 'PUT':
         data = request.get_json()
         view = View.query.get(id)
