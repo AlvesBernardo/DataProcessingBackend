@@ -6,6 +6,7 @@ from app.models.classification_model import Classification
 from app.models.genre_model import Genre
 from app.models.movie_model import Movie
 from app.models.view_model import View
+from app.models.timesPlayed_model import TimesPlayed
 from sqlalchemy.orm import scoped_session
 import datetime
 from datetime import timedelta,time
@@ -53,13 +54,16 @@ def pause_movie(profile_id,movie_id):
             else:
                 return jsonify({'message': 'view could not be added', 'error_message': end_message})
         else :
-            hours, remainder = divmod(time_played.total_seconds(), 3600)
-            minutes, seconds = divmod(remainder, 60)
-            time_object = time(int(hours), int(minutes), int(seconds))
+            reference_date = datetime.date.today()
+            datetime_obj = datetime.datetime.combine(reference_date, view.dtMovieTime)
+            updated_datetime = datetime_obj + time_played
+
+            view.dtMovieTime = updated_datetime.time()
             # update the view.dtMovieTime
+
             db.session.commit()
 
-            return jsonify({'message ' : f"you have watched {view.dtMovieTime} of the movie"})
+            return jsonify({'message ' : f"you have watched {view.dtMovieTime} of the movie and now {time_played}"})
 
     else :
         return jsonify({'message' : 'movie cannot be stopped at the moment'})
@@ -70,6 +74,12 @@ def pause_movie(profile_id,movie_id):
 
 @functionality_routes.route('/get_times_played/<int:movieId>')
 @auth_guard('user')
-def getHowManyTimesMoviePlayed(movieId = None):
-    pass
+def getHowManyTimesMoviePlayed(movieId):
+    timesPlayed = TimesPlayed.query.filter_by(fiMovie = movieId).first()
+    if timesPlayed :
+        return jsonify({"mesage" : "timesPlayed.dtPlayCount"})
+    else :
+        return jsonify({"mesage": "0 times played"})
+
+
 
