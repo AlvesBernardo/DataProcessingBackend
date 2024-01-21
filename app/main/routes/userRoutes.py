@@ -1,27 +1,22 @@
 from app.extensions import db
 from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify
-from app.config.connection_configuration import engine, session
-from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer
 from app.models.account_model import Account
-from app.models.classification_model import Classification
-from app.models.genre_model import Genre
 from app.models.language_model import Language
-from app.models.movie_model import Movie
 from app.models.profile_model import Profile
-from app.models.quality_model import Quality
 from app.models.subscription_model import Subcription
-from app.models.subtitle_model import Subtitle
 from app.models.view_model import View
 from app.models.watchList_model import WatchList
 from app.services.auth_guard import auth_guard, check_jwt_token
 import datetime
+from app.services.auth_guard import auth_guard
 from app.extensions import call_stored_procedure_post ,call_stored_procedure_get
 user_route = Blueprint('user', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
 @user_route.route('/users', methods=['GET', 'POST'])
 @user_route.route('/users/<id>', methods=['GET', 'POST', 'DELETE'])
+@auth_guard('admin')
 def manage_users(id=None):
     """
     This method `manage_users` handles various HTTP methods and operations related to user management.
@@ -177,6 +172,7 @@ def manage_subscriptions(id=None):
 
 @user_route.route('/languages', methods=['GET', 'POST'])
 @user_route.route('/languages/<id>', methods=['GET', 'POST', 'DELETE'])
+@auth_guard('admin')
 def manage_languages(id=None):
     """
     This method, `manage_languages`, is used to manage languages in a user API. It handles HTTP GET, POST, and DELETE requests for language resources.
@@ -257,6 +253,7 @@ def manage_languages(id=None):
 
 @user_route.route('/profiles', methods=['GET', 'POST'])
 @user_route.route('/profiles/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard('admin')
 def manage_profiles(id=None):
     """
     Endpoint for managing profiles.
@@ -329,6 +326,7 @@ def manage_profiles(id=None):
 
 @user_route.route('/views',methods = ['GET','POST'])
 @user_route.route('/views/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@auth_guard('admin')
 def manage_views(id=None):
     """
     :param id: The ID of the view to be managed. If provided, it returns a specific view. If not provided, it returns all views.
@@ -400,28 +398,9 @@ def manage_views(id=None):
         if not view:
             return jsonify({'message': 'No View found!'})
 
-
-
-
-
-@user_route.route('/quality')
-def test_connection():
-    try:
-
-        # Query the first row from the Quality table
-        first_row = View.query.first()
-        
-        if first_row:
-            result = f"First row: {first_row.idView}"
-        else:
-            result = "No records found in dbo.tblQuality"
-
-        return result
-
-    except Exception as e:
-        return f"Error: {e}"
-
+@user_route.route('/watchlist',methods = ['GET','POST'])
 @user_route.route('/watchlist/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@auth_guard('admin')
 def handle_watchlist(id=None):
     if request.method == 'GET':
         if id:

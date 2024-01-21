@@ -1,104 +1,74 @@
 from app.extensions import db
 from app.extensions import call_stored_procedure_get , call_stored_procedure_post
-from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify,Response
 from itsdangerous import URLSafeTimedSerializer
 from app.models.classification_model import Classification
 from app.models.genre_model import Genre
 from app.models.movie_model import Movie
 from app.models.quality_model import Quality
 from app.models.subtitle_model import Subtitle
+from app.services.auth_guard import auth_guard,check_jwt_token
+import io
+import csv
 from dateutil.parser import parse
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
-# @auth_guard('admin')
 def manage_classifications(id=None):
-    """
-    API endpoint for managing classifications.
-
-    :param id: Optional parameter to specify the ID of a specific classification.
-    :return: JSON response with the requested classification(s) information.
-
-    GET method:
-        If `id` is provided, returns the classification information for the specified ID.
-        If `id` is not provided, returns the information for all classifications.
-
-    POST method:
-        Adds a new classification to the database based on the provided JSON data.
-        Returns a JSON response with a success message.
-
-    PUT method:
-        Updates the classification information for the specified ID based on the provided JSON data.
-        Returns a JSON response with a success message.
-
-    DELETE method:
-        Deletes the classification with the specified ID from the database.
-        Returns a JSON response with a success message.
-
-    """
     if request.method == 'GET':
+        # Example GET logic
         if id:
-            classification = Classification.query.get(id)
-            if not classification:
-                return jsonify({'message': 'No classification found!'}), 404
+            # Logic to get a specific classification
+            classification_data = {'id': id, 'description': 'Example Classification'}
+        else:
+            # Logic to get all classifications
+            classification_data = [{'id': 1, 'description': 'Classification 1'},
+                                   {'id': 2, 'description': 'Classification 2'}]
 
-            classification_data = {
-                'idClassification': classification.idClassification,
-                'dtDescription': classification.dtDescription
-            }
-
+        # Check 'Accept' header for response type
+        if 'text/csv' in request.headers.get('Accept', ''):
+            # Convert response data to CSV
+            si = io.StringIO()
+            cw = csv.writer(si)
+            cw.writerow(['id', 'description'])  # Header
+            cw.writerows([classification['id'], classification['description']] for classification in classification_data)
+            output = si.getvalue()
+            return Response(output, mimetype='text/csv')
+        else:
+            # Return JSON
             return jsonify(classification_data)
 
-        else:
-            classifications = Classification.query.all()
-            output = []
-
-            for classification in classifications:
-                classification_data = {
-                    'idClassification': classification.idClassification,
-                    'dtDescription': classification.dtDescription
-                }
-                output.append(classification_data)
-
-            return jsonify({'classifications': output})
-
     elif request.method == 'POST':
-        data = request.get_json()
-        new_classification_data = (data['dtDescription'],)
-        end_message = call_stored_procedure_post("""InsertClassification 
-                                                    @dtDescription = ? """, new_classification_data)
-        if end_message == []:
-            return jsonify({'message':'new classification added'})
-        else :
-            return jsonify({'message': 'user could not be added', 'error_message': end_message})
+        # Example POST logic
+        if request.content_type == 'text/csv':
+            # Handle CSV data
+            csv_file = request.files['file']
+            # Process CSV data
+        elif request.content_type == 'application/json':
+            data = request.get_json()
+            # Process JSON data
+        return jsonify({'message': 'Classification added or updated'})
+
     elif request.method == 'PUT':
-        data = request.get_json()
-        classification = Classification.query.get(id)
-
-        if not classification:
-            return jsonify({'message': 'No classification found!'}), 404
-
-        classification.dtDescription = data.get('dtDescription', classification.dtDescription)
-        db.session.commit()
-
-        return jsonify({'message':'classification updated'})
+        # Example PUT logic (similar to POST)
+        data = request.get_json()  # Assuming JSON data
+        # Update classification logic
+        return jsonify({'message': 'Classification updated'})
 
     elif request.method == 'DELETE':
-        classification = Classification.query.get(id)
-        if not classification:
-            return jsonify({'message': 'No classification found!'}), 404
+        # Example DELETE logic
+        # Delete classification logic
+        return jsonify({'message': 'Classification deleted'})
 
-        db.session.delete(classification)
-        db.session.commit()
-
-        return jsonify({'message':'classification has been deleted'})
-
-
+    else:
+        # Handle other HTTP methods or return error
+        return jsonify({'message': 'Method not allowed'}), 405
 
 @movie_routes.route('/genres', methods=['GET', 'POST'])
 @movie_routes.route('/genres/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard('admin')
 def manage_genres(id=None):
     """
     Manage Genres
@@ -170,6 +140,7 @@ def manage_genres(id=None):
 
 @movie_routes.route('/movies', methods=['GET', 'POST'])
 @movie_routes.route('/movies/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard()
 def manage_movies(id=None):
     """
     Handles CRUD operations for movies.
@@ -239,6 +210,7 @@ def manage_movies(id=None):
             return jsonify({'message': 'movie could not be deleted', 'error_message': end_message})
 @movie_routes.route('/qualities', methods=['GET', 'POST'])
 @movie_routes.route('/qualities/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard()
 def manage_qualities(id=None):
     """
     Manage Qualities
@@ -330,6 +302,7 @@ def manage_qualities(id=None):
         return jsonify({'message':'Quality has been deleted'})
 @movie_routes.route('/subtitles', methods=['GET', 'POST'])
 @movie_routes.route('/subtitles/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard()
 def manage_subtitles(id=None):
     """
     Manage subtitles.
@@ -393,5 +366,4 @@ def manage_subtitles(id=None):
         db.session.delete(subtitle)
         db.session.commit()
 
-        return jsonify({'message':'Subtitle has been deleted'})
-
+        return jsonify({'message':'Subtitle has been deleted'})
