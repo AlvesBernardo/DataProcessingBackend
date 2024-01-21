@@ -40,10 +40,10 @@ class TestRoutes(TestCase):
         return self.app
 
     def setUp(self):
-        self.test_subscription = { /* Add your subscription data here */ }
-        self.test_language = { /* Add your language data here */ }
-        self.test_profile = { /* Add your profile data here */ }
-        self.test_view = { /* Add your view data here */ }
+        self.test_subscription = Subcription.query.filter_by(idSubscription = 1).first()
+        self.test_language = Language.query.filter_by(idLanguage = 1).first()
+        self.test_profile = Profile.query.filter_by(idProfile = 10).first()
+        self.test_view = View.query.filter_by(idView = 15).first()
 
         def test_manage_subscriptions(self):
             response = self.client.post('/subscriptions', data=json.dumps(self.test_subscription), content_type='application/json')
@@ -128,12 +128,12 @@ class TestRoutes(TestCase):
             self.assert400(response)
 
         def test_create_profile_with_existing_id(self):
-            existing_profile = {/* existing data */}
+            existing_profile = Profile.query.filter_by(idProfile = 10).first()
             response = self.client.post('/profiles', data=json.dumps(existing_profile), content_type='application/json')
             self.assert400(response)
 
         def test_manage_views_with_invalid_data(self):
-            invalid_test_view = {/* invalid data */}
+            invalid_test_view = View.query.filter_by(idView = 100).first()
             response = self.client.post('/views', data=json.dumps(invalid_test_view), content_type='application/json')
             # assuming that your application correctly validates input and returns a 400 status code for invalid data
             self.assert400(response)
@@ -177,25 +177,25 @@ class TestRoutes(TestCase):
         def test_post_invalid_subscription(self):
             # Test POST request with invalid subscription data (data validation should be implemented in your routes)
             # for example, trying to add a new subscription without a compolsory field
-            invalid_subscription = { /* Add your invalid subscription data here */ }
+            invalid_subscription = Subcription.query.filter_by(idSubscription = 1000).first()
             response = self.client.post('/subscriptions', data=json.dumps(invalid_subscription), content_type='application/json')
             self.assert400(response)  # Bad request
 
         def test_post_invalid_language(self):
             # Test POST request with invalid language data
-            invalid_language = { /* Add your invalid language data here */ }
+            invalid_language = Language.query.filter_by(idLanguage =1000).first()
             response = self.client.post('/languages', data=json.dumps(invalid_language), content_type='application/json')
             self.assert400(response)
 
         def test_post_invalid_profile(self):
             # Test POST request with invalid profile data
-            invalid_profile = { /* Add your invalid profile data here */ }
+            invalid_profile = Profile.query.filter_by(idProfile = 10000).first()
             response = self.client.post('/profiles', data=json.dumps(invalid_profile), content_type='application/json')
             self.assert400(response)
 
         def test_post_invalid_view(self):
             # Test POST request with invalid view data
-            invalid_view = { /* Add your invalid view data here */ }
+            invalid_view = View.query.filter_by(idView = 1000).first()
             response = self.client.post('/views', data=json.dumps(invalid_view), content_type='application/json')
             self.assert400(response)
 
