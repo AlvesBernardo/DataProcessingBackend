@@ -2,12 +2,10 @@ from app.extensions import db
 from app.extensions import call_stored_procedure_get , call_stored_procedure_post
 from flask import Flask, Blueprint,  jsonify
 from itsdangerous import URLSafeTimedSerializer
-from app.models.classification_model import Classification
-from app.models.genre_model import Genre
+from app.models.profile_model import Profile
 from app.models.movie_model import Movie
 from app.models.view_model import View
 from app.models.timesPlayed_model import TimesPlayed
-from sqlalchemy.orm import scoped_session
 import datetime
 from datetime import timedelta,time
 from dateutil.parser import parse
@@ -17,10 +15,15 @@ s = URLSafeTimedSerializer('secret')
 
 play_time_counter = {}
 @functionality_routes.route('/play_movie/<int:profile_id>/<int:movie_id>')
-@auth_guard('user')
+@auth_guard()
 def play_movie(profile_id,movie_id):
     profile_id = str(profile_id)
     movie_id = str(movie_id)
+    #check if profile_id and movie_id exist
+    profile = Profile.query.filter_by(idProfile = profile_id).first()
+    movie = Movie.query.filter_by(idMovie = movie_id).first()
+    if profile == None or movie == None :
+        return jsonify({"message" : "data not found"}) , 404
     if profile_id in play_time_counter:
         return jsonify({"message" : "movie cannot be played at the moment"})
     else :
@@ -32,6 +35,10 @@ def play_movie(profile_id,movie_id):
 def pause_movie(profile_id,movie_id):
     profile_id = str(profile_id)
     movie_id = str(movie_id)
+    profile = Profile.query.filter_by(idProfile=profile_id).first()
+    movie = Movie.query.filter_by(idMovie=movie_id).first()
+    if profile == None or movie == None:
+        return jsonify({"message": "data not found"}), 404
     if profile_id in play_time_counter:
         #calculates how much you played of the movie
         time_played = datetime.datetime.now() - play_time_counter[profile_id]["start_counter"]
@@ -73,11 +80,11 @@ def pause_movie(profile_id,movie_id):
 
 
 @functionality_routes.route('/get_times_played/<int:movieId>')
-@auth_guard('user')
+@auth_guard()
 def getHowManyTimesMoviePlayed(movieId):
     timesPlayed = TimesPlayed.query.filter_by(fiMovie = movieId).first()
     if timesPlayed :
-        return jsonify({"mesage" : "timesPlayed.dtPlayCount"})
+        return jsonify({"mesage": "timesPlayed.dtPlayCount"})
     else :
         return jsonify({"mesage": "0 times played"})
 

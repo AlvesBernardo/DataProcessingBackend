@@ -7,13 +7,14 @@ from app.models.genre_model import Genre
 from app.models.movie_model import Movie
 from app.models.quality_model import Quality
 from app.models.subtitle_model import Subtitle
+from app.services.auth_guard import auth_guard,check_jwt_token
 from dateutil.parser import parse
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
-# @auth_guard('admin')
+@auth_guard('admin')
 def manage_classifications(id=None):
     """
     API endpoint for managing classifications.
@@ -99,6 +100,7 @@ def manage_classifications(id=None):
 
 @movie_routes.route('/genres', methods=['GET', 'POST'])
 @movie_routes.route('/genres/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard('admin')
 def manage_genres(id=None):
     """
     Manage Genres
@@ -170,6 +172,7 @@ def manage_genres(id=None):
 
 @movie_routes.route('/movies', methods=['GET', 'POST'])
 @movie_routes.route('/movies/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard()
 def manage_movies(id=None):
     """
     Handles CRUD operations for movies.
@@ -239,6 +242,7 @@ def manage_movies(id=None):
             return jsonify({'message': 'movie could not be deleted', 'error_message': end_message})
 @movie_routes.route('/qualities', methods=['GET', 'POST'])
 @movie_routes.route('/qualities/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard()
 def manage_qualities(id=None):
     """
     Manage Qualities
@@ -330,6 +334,7 @@ def manage_qualities(id=None):
         return jsonify({'message':'Quality has been deleted'})
 @movie_routes.route('/subtitles', methods=['GET', 'POST'])
 @movie_routes.route('/subtitles/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard()
 def manage_subtitles(id=None):
     """
     Manage subtitles.
