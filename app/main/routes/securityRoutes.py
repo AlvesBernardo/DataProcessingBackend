@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.account_model import Account
 from itsdangerous import URLSafeTimedSerializer
 from app.services.jwt_handler import generate_jwt_token
+from datetime import datetime, timedelta, timezone
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
 @security.route('/login', methods=['POST'])
@@ -19,15 +20,35 @@ def login():
         return jsonify({'message': 'Bad Request'}), 400
 
     user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
-    if user and  check_password_hash(user.dtPassword,data['dtPassword']):
-        user_info =  {"idAccount" : user.idAccount ,"dtEmail" : data['dtEmail']}
-        if (user.dtIsAdmin == 0) :
-            user_info["roles"] = "user"
-        else :
-            user_info["roles"] = "admin"
-        token = generate_jwt_token(payload= user_info,lifetime=3000)
+    if user:
+        if user.isAccountBlocked and user.blocked_until and user.blocked_until > datetime.now(timezone.utc):
+            return jsonify(
+                {"message": "Your account has been blocked for 1 hour due to too many failed login attempts"}), 403
 
-        return jsonify({'message': 'Logged in successfully','token' : token}), 200
+        if check_password_hash(user.dtPassword, data['dtPassword']):
+            user.failed_login_attempts = 0
+
+            user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
+            if user.dtIsAdmin == 0:
+                user_info["roles"] = "user"
+            else:
+                user_info["roles"] = "admin"
+            token = generate_jwt_token(payload=user_info, lifetime=3000)
+
+            db.session.commit()
+
+            return jsonify({'message': 'Logged in successfully', 'token': token}), 200
+        else:
+            user.failed_login_attempts += 1
+
+            if user.failed_login_attempts >= 3:
+                user.isAccountBlocked = True
+                user.blocked_until = datetime.now(timezone.utc) + timedelta(minutes=60)
+
+            db.session.commit()
+
+            return jsonify({'message': 'Incorrect email or password'}), 401
+
     else:
         return jsonify({'message': 'Incorrect email or password'}), 401
 
