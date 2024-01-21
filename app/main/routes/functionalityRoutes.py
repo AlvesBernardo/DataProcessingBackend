@@ -41,6 +41,8 @@ def pause_movie(profile_id,movie_id):
         return jsonify({"message": "data not found"}), 404
     if profile_id in play_time_counter:
         #calculates how much you played of the movie
+        if not play_time_counter[profile_id]["movie"] == movie_id :
+            return jsonify({"message" : "This movie is not currently playing"})
         time_played = datetime.datetime.now() - play_time_counter[profile_id]["start_counter"]
         view = View.query.filter_by(fiMovie = movie_id, fiProfile = profile_id).first()
         play_time_counter.pop(profile_id)
