@@ -14,6 +14,7 @@ from dateutil.parser import parse
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
+
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_classifications(id=None):
@@ -66,78 +67,65 @@ def manage_classifications(id=None):
         # Handle other HTTP methods or return error
         return jsonify({'message': 'Method not allowed'}), 405
 
+
+@auth_guard('admin')
 @movie_routes.route('/genres', methods=['GET', 'POST'])
 @movie_routes.route('/genres/<id>', methods=['GET', 'PUT', 'DELETE'])
-@auth_guard('admin')
 def manage_genres(id=None):
-    """
-    Manage Genres
-
-    Handles various operations related to genres.
-
-    :param id: The ID of the genre to manage. Defaults to None.
-    :return: Returns the result of the operation as JSON.
-
-    """
     if request.method == 'GET':
+        # GET logic
         if id:
+            # Logic to get a specific genre
             genre = Genre.query.get(id)
             if not genre:
                 return jsonify({'message': 'No genre found!'}), 404
-
-            genre_data = {
-                'idGenre': genre.idGenre,
-                'dtDescription': genre.dtDescription
-            }
-
-            return jsonify(genre_data)
-
+            genre_data = {'idGenre': genre.idGenre, 'dtDescription': genre.dtDescription}
         else:
+            # Logic to get all genres
             genres = Genre.query.all()
-            output = []
+            genre_data = [{'idGenre': genre.idGenre, 'dtDescription': genre.dtDescription} for genre in genres]
 
-            for genre in genres:
-                genre_data = {
-                    'idGenre': genre.idGenre,
-                    'dtDescription': genre.dtDescription
-                }
-                output.append(genre_data)
-
-            return jsonify({'genres': output})
+        # Response type handling
+        if 'text/csv' in request.headers.get('Accept', ''):
+            si = io.StringIO()
+            cw = csv.writer(si)
+            cw.writerow(['idGenre', 'dtDescription'])
+            cw.writerows([[genre['idGenre'], genre['dtDescription']] for genre in genre_data])
+            output = si.getvalue()
+            return Response(output, mimetype='text/csv')
+        else:
+            return jsonify({'genres': genre_data})
 
     elif request.method == 'POST':
-        data = request.get_json()
-        new_genre_data = (data['genreDescription'],)
-        end_message = call_stored_procedure_post("""InsertGenre
-                                                            @GenreDescription = ? """, new_genre_data)
-        if end_message == []:
-            return jsonify({'message': 'new genre added'})
-        else:
-            return jsonify({'message': 'genre could not be added', 'error_message': end_message})
-        return jsonify({'message':'new genre added'})
+        if request.content_type == 'text/csv':
+            csv_file = request.files['file']
+            # Process CSV data
+        elif request.content_type == 'application/json':
+            data = request.get_json()
+            # Process JSON data
+        return jsonify({'message': 'Genre added'})
 
     elif request.method == 'PUT':
         data = request.get_json()
         genre = Genre.query.get(id)
-
         if not genre:
             return jsonify({'message': 'No genre found!'}), 404
-
-        genre.dtDescription = data.get('dtDescription', genre.dtDescription)
+        # Update logic
+        genre.dtDescription = data['dtDescription']
         db.session.commit()
-
-        return jsonify({'message':'genre updated'})
+        return jsonify({'message': 'Genre updated'})
 
     elif request.method == 'DELETE':
         genre = Genre.query.get(id)
         if not genre:
             return jsonify({'message': 'No genre found!'}), 404
-
         db.session.delete(genre)
         db.session.commit()
+        return jsonify({'message': 'Genre deleted'})
 
-        return jsonify({'message':'genre has been deleted'})
-
+    else:
+        return jsonify({'message': 'Method not allowed'}), 405
+    
 @movie_routes.route('/movies', methods=['GET', 'POST'])
 @movie_routes.route('/movies/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard()
