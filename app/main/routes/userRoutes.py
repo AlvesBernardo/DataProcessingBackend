@@ -430,10 +430,14 @@ def handle_watchlist(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_watchlist = WatchList(fiMovie=data['fiMovie'], fiProfile=data['fiProfile'])
-        db.session.add(new_watchlist)
-        db.session.commit()
-        return jsonify(new_watchlist.serialize()), 201
+        new_watchlist_data = (data['fiMovie'], data['fiProfile'])
+        end_message = call_stored_procedure_post("""InsertWatchList
+                                                        @MovieID = ? ,
+                                                        @ProfileID = ? """, new_watchlist_data)
+        if not end_message:
+            return jsonify({'message': 'new watchlist added'}), 201
+        else:
+            return jsonify({'message': 'watchlist could not be added', 'error_message': end_message})
 
     elif request.method == 'PUT':
         data = request.get_json()
