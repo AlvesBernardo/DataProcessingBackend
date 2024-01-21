@@ -97,7 +97,7 @@ def register():
 
         end_message = call_stored_procedure_post("""InsertCode 
                                                             @Code = ? ,
-                                                            @dtEmail = ? """,
+                                                            @fiEmail = ? """,
                                                  code_data)
 
         if not end_message:
