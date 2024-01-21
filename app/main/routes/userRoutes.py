@@ -13,6 +13,7 @@ from app.models.quality_model import Quality
 from app.models.subscription_model import Subcription
 from app.models.subtitle_model import Subtitle
 from app.models.view_model import View
+from app.models.watchList_model import WatchList
 import datetime
 from app.extensions import call_stored_procedure_post ,call_stored_procedure_get
 user_route = Blueprint('user', __name__)
@@ -414,3 +415,43 @@ def test_connection():
 
     except Exception as e:
         return f"Error: {e}"
+
+@user_route.route('/watchlist/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def handle_watchlist(id=None):
+    if request.method == 'GET':
+        if id:
+            watchlist = WatchList.query.get(id)
+            if watchlist is None:
+                return jsonify(f'Watchlist with Id {id} does not exist'), 404
+            return jsonify(watchlist.serialize())
+        else:
+            watchlists = WatchList.query.all()
+            return jsonify([e.serialize() for e in watchlists])
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        new_watchlist = WatchList(fiMovie=data['fiMovie'], fiProfile=data['fiProfile'])
+        db.session.add(new_watchlist)
+        db.session.commit()
+        return jsonify(new_watchlist.serialize()), 201
+
+    elif request.method == 'PUT':
+        data = request.get_json()
+        watchlist = WatchList.query.get(id)
+        if 'fiMovie' in data:
+            watchlist.fiMovie = data['fiMovie']
+        if 'fiProfile' in data:
+            watchlist.fiProfile = data['fiProfile']
+        db.session.commit()
+        return jsonify(watchlist.serialize())
+
+    elif request.method == 'DELETE':
+        watchlist = WatchList.query.get(id)
+        if watchlist is None:
+            return jsonify(f'Watchlist with Id {id} does not exist'), 404
+        db.session.delete(watchlist)
+        db.session.commit()
+        return '', 204
+
+    else:
+        return jsonify(f'Invalid request method'), 405
