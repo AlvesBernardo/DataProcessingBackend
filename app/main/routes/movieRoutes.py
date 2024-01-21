@@ -366,5 +366,4 @@ def manage_subtitles(id=None):
         db.session.delete(subtitle)
         db.session.commit()
 
-        return jsonify({'message':'Subtitle has been deleted'})
-
+        return jsonify({'message':'Subtitle has been deleted'})
