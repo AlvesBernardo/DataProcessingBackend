@@ -14,6 +14,7 @@ from app.models.subscription_model import Subcription
 from app.models.subtitle_model import Subtitle
 from app.models.view_model import View
 from app.models.watchList_model import WatchList
+from app.services.auth_guard import auth_guard, check_jwt_token
 import datetime
 from app.extensions import call_stored_procedure_post ,call_stored_procedure_get
 user_route = Blueprint('user', __name__)
@@ -89,6 +90,7 @@ def manage_users(id=None):
 
 @user_route.route('/subscriptions', methods=['GET', 'POST'])
 @user_route.route('/subscriptions/<id>', methods=['GET', 'POST', 'DELETE'])
+@auth_guard
 def manage_subscriptions(id=None):
     """
     This function is used to manage subscriptions of a user. It handles HTTP GET, POST, and DELETE request methods for the '/subscriptions' route.
@@ -119,30 +121,33 @@ def manage_subscriptions(id=None):
 
     """
     if request.method == 'GET':
-        if id:
-            subscription = Subcription.query.get(id)
-            if not subscription:
-                return jsonify({'message': 'No subscription found!'}), 404
+        current_user_id = check_jwt_token()
 
-            subscription_data = {
-                'idSubscription': subscription.idSubscription
-                # Add here all the other properties you want to send
-            }
+        # Call the stored procedure with the user's ID
+        account_details = call_stored_procedure_get("""
+            GetAccountDetails
+            @AccountID = ?
+        """, (current_user_id,))
 
-            return jsonify(subscription_data)
+        if not account_details:
+            return jsonify({'message': 'Account details not found.'}), 404
 
-        else:  # If id is not provided, return all subscriptions
-            subscriptions = Subcription.query.all()
-            output = []
+        # Assuming the stored procedure returns a single row, you can directly access the first element
+        account_details = account_details[0]
 
-            for subscription in subscriptions:
-                subscription_data = {
-                    'idSubscription': subscription.idSubscription
-                    # Add here all the other properties you want to send
-                }
-                output.append(subscription_data)
+        # Map the result to a JSON response
+        response = {
+            'idAccount': account_details[0],
+            'dtEmail': account_details[1],
+            'dtPassword': account_details[2],
+            'dtPayment': account_details[3],
+            'dtDateOfSignUp': account_details[4],
+            'dtSubscriptionPrice': account_details[5],
+            'dtDescription': account_details[6]
+        }
 
-            return jsonify({'subscriptions': output})
+        return jsonify(response)
+
 
     elif request.method == 'POST':
         data = request.get_json()
