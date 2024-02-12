@@ -4,7 +4,7 @@ from flask import Blueprint, request, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.account_model import Account
 from itsdangerous import URLSafeTimedSerializer
-from app.services.jwt_handler import generate_jwt_token
+from app.services.jwt_handler import generate_jwt_token, generate_refresh_token
 from datetime import datetime, timedelta, timezone
 import random
 from app.extensions import call_stored_procedure_post
@@ -17,7 +17,6 @@ s = URLSafeTimedSerializer('secret')
 def login():
     """
     Authenticate user credentials and allow login.
-
     :return: Response message with appropriate status code
     """
     data = request.get_json()
@@ -39,6 +38,7 @@ def login():
             else:
                 user_info["roles"] = "admin"
             token = generate_jwt_token(payload=user_info, lifetime=3000)
+            refresh_token = generate_refresh_token(payload=user_info, lifetime=1440)
 
             db.session.commit()
 
