@@ -16,11 +16,11 @@ This Flask project provides a RESTful API with a Microsoft SQL Server (MSSQL) da
 - A suitable web browser for accessing the frontend.
 - Access to a Microsoft SQL Server (MSSQL) database.
 
-## Installing Python
+### Installing Python
 
 Python is a versatile programming language that you need to run this project. If you don't have Python installed on your system, follow these steps to install it.
 
-### For Windows Users
+#### For Windows Users
 
 1. **Download Python:**
 
@@ -36,7 +36,7 @@ Python is a versatile programming language that you need to run this project. If
    - Open Command Prompt and type `python --version`.
    - If Python is installed correctly, you should see the version number.
 
-### For MacOS Users
+#### For MacOS Users
 
 1. **Install Homebrew:**
 
@@ -56,7 +56,7 @@ Python is a versatile programming language that you need to run this project. If
    - In Terminal, type `python3 --version`.
    - The version number of Python should display.
 
-## Installing pip
+### Installing pip
 
 `pip` is a package manager for Python that allows you to install and manage additional libraries and dependencies that are not distributed as part of the standard library.
 
@@ -91,11 +91,11 @@ This command will display the version of `pip` if it is already installed.
    pip install -r requirements.txt
    ```
 
-## Optional: Setting Up a Python Virtual Environment
+### Optional: Setting Up a Python Virtual Environment
 
 Using a virtual environment is an optional but recommended approach to manage this project's Python dependencies separately from your global Python installation. It provides an isolated environment, ensuring project-specific dependencies don’t conflict with other projects.
 
-### Working with a Virtual Environment (Optional)
+#### Working with a Virtual Environment (Optional)
 
 It could be handy because you do not need to install on your machine all the libraries.
 
@@ -109,7 +109,7 @@ It could be handy because you do not need to install on your machine all the lib
      python -m venv venv
      ```
 
-### Activating the Virtual Environment
+#### Activating the Virtual Environment
 
 - **On Windows:**
   .\venv\Scripts\activate
@@ -117,7 +117,7 @@ It could be handy because you do not need to install on your machine all the lib
 - **On MacOS/Linux:**
   source venv/bin/activate
 
-### Installing Dependencies in the Virtual Environment (Optional)
+#### Installing Dependencies in the Virtual Environment (Optional)
 
 - With the virtual environment activated, install the project-specific dependencies:
   pip install -r requirements.txt
@@ -133,7 +133,7 @@ It could be handy because you do not need to install on your machine all the lib
 
 2. In order to use the login system, the user must login from the frontend.
 
-### Libraries used
+## Libraries used
 
 - blinker==1.7.0
 - certifi==2023.11.17
