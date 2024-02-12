@@ -133,6 +133,16 @@ It could be handy because you do not need to install on your machine all the lib
 
 2. In order to use the login system, the user must login from the frontend.
 
+- When the user logs in with frontend, the route will check if there is any refresh token stored in the database. If there was any, it will check the expire date of the refresh token.
+
+- The refresh token is valid for 24 hours and access token is valid for one hour.
+
+- If the refresh token was still valid, it generates a new access token and user will logs in automatically.
+
+- If the refresh token was not provided or expired, it will generate a new refresh token and store it to database.
+
+- The process is same for register route.
+
 ## Libraries used
 
 - blinker==1.7.0
