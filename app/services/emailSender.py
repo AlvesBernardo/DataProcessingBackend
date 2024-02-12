@@ -37,5 +37,3 @@ def send_email(receiver_email, subject, body):
   print(result.json())
 
 
-# Use the function
-# send_email("receiver_email@example.com")

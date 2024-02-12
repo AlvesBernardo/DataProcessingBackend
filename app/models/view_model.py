@@ -1,8 +1,5 @@
 from app.extensions import db
 from sqlalchemy.orm import relationship
-from .subtitle_model import Subtitle
-from .movie_model import Movie
-from .profile_model import Profile
 class View(db.Model) : 
     __tablename__ = 'tblView'  # Specify the table name
     idView = db.Column(db.Integer, primary_key=True)

@@ -1,5 +1,5 @@
 from app.extensions import db
-from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, request, jsonify
 from itsdangerous import URLSafeTimedSerializer
 from app.models.account_model import Account
 from app.models.language_model import Language

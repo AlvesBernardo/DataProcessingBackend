@@ -1,6 +1,5 @@
-# test_routes.py
 import json
-from app import create_app, db
+from app import create_app
 from app.models.subscription_model import Subcription
 from app.models.language_model import Language
 from app.models.profile_model import Profile

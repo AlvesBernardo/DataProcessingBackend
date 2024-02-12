@@ -127,7 +127,7 @@ It could be handy because you do not need to install on your machine all the lib
 1. The project is run using the following command :
 
    ```
-      cd .\app\
+      Using the preferred code editor run the app/app.py file
 
    ```
 

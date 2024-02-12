@@ -1,7 +1,6 @@
 from app.extensions import db
 from sqlalchemy.orm import relationship
-from .account_model import Account
-from .genre_model import Genre
+
 class Profile(db.Model) : 
     __tablename__ = 'tblProfile'  # Specify the table name
     idProfile = db.Column(db.Integer, primary_key=True)

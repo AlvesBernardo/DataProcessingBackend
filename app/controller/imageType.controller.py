@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 from sqlalchemy.orm import sessionmaker
 from app.config.connection_configuration import engine, quality_table
 
