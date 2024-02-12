@@ -15,8 +15,6 @@ app.register_blueprint(user_route)
 app.register_blueprint(security)
 app.register_blueprint(movie_routes)
 app.register_blueprint(functionality_routes)
-# @app.route('/email')
-# def sendingEmail():  # put application's code here
-#      send_email('mahdisadeghi.business@gmail.com')
+
 if __name__ == '__main__':
     app.run(debug=True)

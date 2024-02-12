@@ -60,6 +60,7 @@ This Flask project provides a RESTful API with a Microsoft SQL Server (MSSQL) da
 1. The project is run using the following command : 
 
    ```
+      cd .\app\
       
    ```
 
