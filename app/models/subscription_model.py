@@ -1,6 +1,5 @@
 from app.extensions import db
 from sqlalchemy.orm import relationship
-from .quality_model import Quality
 class Subcription(db.Model) :
     __tablename__ = 'tblSubscription'
     idSubscription = db.Column(db.Integer, primary_key=True)

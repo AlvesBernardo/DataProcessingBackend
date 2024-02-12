@@ -1,8 +1,6 @@
 from sqlalchemy.orm import relationship
 from app.extensions import db
-from .subscription_model import  Subcription
-from .language_model import Language
-from datetime import datetime
+
 class Account(db.Model):
     __tablename__ = 'tblAccount'
     idAccount = db.Column(db.Integer, primary_key=True)

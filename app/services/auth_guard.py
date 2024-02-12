@@ -1,11 +1,5 @@
 from flask import request, jsonify
-import sys
-import urllib.parse
-# Load environment variables from .env file
 from .jwt_handler import decode_jwt_token
-import base64
-
-
 def check_jwt_token(token=None):
     if token is None:
         # If token is not provided, get it from the request headers

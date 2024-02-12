@@ -1,13 +1,12 @@
 from app.extensions import db
 from app.extensions import call_stored_procedure_get , call_stored_procedure_post
-from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify,Response
+from flask import Blueprint, request, jsonify,Response
 from itsdangerous import URLSafeTimedSerializer
-from app.models.classification_model import Classification
 from app.models.genre_model import Genre
 from app.models.movie_model import Movie
 from app.models.quality_model import Quality
 from app.models.subtitle_model import Subtitle
-from app.services.auth_guard import auth_guard,check_jwt_token
+from app.services.auth_guard import auth_guard
 import io
 import csv
 from dateutil.parser import parse

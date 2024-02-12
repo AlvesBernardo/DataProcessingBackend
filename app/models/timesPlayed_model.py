@@ -1,8 +1,5 @@
 from app.extensions import db
 from sqlalchemy.orm import relationship
-# from .subtitle_model import Subtitle
-# from .movie_model import Movie
-# from .profile_model import Profile
 class TimesPlayed(db.Model) :
     __tablename__ = 'tblTimesPlayed'  # Specify the table name
     idTimesPlayed = db.Column (db.Integer,primary_key = True)

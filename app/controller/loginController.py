@@ -1,7 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for
 import requests
-import re
-from werkzeug.security import generate_password_hash
 
 def logIn():        
     email = request.form['email']

@@ -6,7 +6,6 @@ import sys
 # Load environment variables from .env file
 sys.path.append("..") # added!
 load_dotenv()
-
 def generate_jwt_token(payload,lifetime=None):
     # Generates a new JWT token, wrapping information provided by payload (dict)
     # Lifetime describes (in minutes) how much time the token will be valid

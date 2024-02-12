@@ -1,9 +1,5 @@
 from app.extensions import db
 from sqlalchemy.orm import relationship
-from .quality_model import Quality
-from .genre_model import Genre
-from .language_model import Language
-from .classification_model import Classification
 class Movie(db.Model) :
     __tablename__ = 'tblMovie'  # Specify the table name
     idMovie = db.Column(db.Integer, primary_key=True)
