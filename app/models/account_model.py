@@ -12,6 +12,7 @@ class Account(db.Model):
     dtFailedLoginAttemps = db.Column(db.Integer, nullable=False, default=0)
     dtAccountBlockedTill = db.Column(db.DateTime, nullable=True)
     dtIsAdmin = db.Column(db.Boolean, nullable=False, default=False)
+    dtRefreshToken = db.Column(db.String(255), nullable=False)
     fiSubscription = db.Column(db.Integer, db.ForeignKey("tblSubscription.idSubscription"))
     subscription = relationship("Subcription")
     fiLanguage = db.Column(db.Integer, db.ForeignKey("tblLanguage.idLanguage"))

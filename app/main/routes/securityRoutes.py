@@ -4,10 +4,13 @@ from flask import Blueprint, request, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.account_model import Account
 from itsdangerous import URLSafeTimedSerializer
-from app.services.jwt_handler import generate_jwt_token, generate_refresh_token
+from app.services.jwt_handler import generate_jwt_token, generate_refresh_token, decode_jwt_token
 from datetime import datetime, timedelta, timezone
 import random
 from app.extensions import call_stored_procedure_post
+from jwt.exceptions import ExpiredSignatureError
+import os
+from jwcrypto import jwk, jwt
 
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
@@ -37,8 +40,16 @@ def login():
                 user_info["roles"] = "user"
             else:
                 user_info["roles"] = "admin"
-            token = generate_jwt_token(payload=user_info, lifetime=3000)
-            refresh_token = generate_refresh_token(payload=user_info, lifetime=1440)
+
+            if user.dtRefreshToken:
+                refreshToken = user.dtRefreshToken
+                if decode_jwt_token(refreshToken):
+                    token = generate_jwt_token(payload=user_info)
+            else:
+                refresh_token = generate_refresh_token(payload=user_info)
+                user.dtRefreshToken = refresh_token
+                user.dtRefreshToken_valid_until = datetime.now(timezone.utc) + timedelta(days=1)
+                token = generate_jwt_token(payload=user_info)
 
             db.session.commit()
 
@@ -89,6 +100,9 @@ def register():
             fiSubscription=1,
             fiLanguage=1
         )
+
+        refresh_token = generate_refresh_token(payload={"idAccount": new_user.idAccount, "dtEmail": data['dtEmail']})
+        new_user.dtRefreshToken = refresh_token
 
         db.session.add(new_user)
         db.session.commit()

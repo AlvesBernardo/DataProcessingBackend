@@ -12,8 +12,8 @@ def generate_jwt_token(payload,lifetime=60):
     token = generate_token(payload, lifetime, "HS256")
     return token
 
-def generate_refresh_token(payload,lifetime=1440): # is valid for 24 hours or 1440 minutes
-    token = generate_token(payload, lifetime, "HS512")
+def generate_refresh_token(payload,lifetime=2880):
+    token = generate_token(payload, lifetime, "HS256")
     return token
 
 def generate_token(payload, lifetime, algorithm):
@@ -27,6 +27,7 @@ def generate_token(payload, lifetime, algorithm):
     return token.serialize()
 
 def decode_jwt_token(token):
-    key = jwk.JWK(kty='oct', k=os.environ.get('SECRET_KEY'))
-    verified_jwt = jwt.JWT(key=key, jwt=token)
-    return json_encode(verified_jwt.claims)
+    try:
+        return jwt.decode(token, os.environ.get('SECRET_KEY'), algorithms=["HS256"])
+    except Exception as e:
+        raise Exception(f'Invalid access token: {e}')

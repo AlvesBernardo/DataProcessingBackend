@@ -1,5 +1,5 @@
 from .extensions import db
-from flask_cors import CORS
+# from flask_cors import CORS
 from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify
 from app.config.connection_configuration import engine, session
 from app.main.routes.securityRoutes import security
