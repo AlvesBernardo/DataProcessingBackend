@@ -41,19 +41,27 @@ def login():
             else:
                 user_info["roles"] = "admin"
 
-            if user.dtRefreshToken:
-                refreshToken = user.dtRefreshToken
-                if decode_jwt_token(refreshToken):
-                    token = generate_jwt_token(payload=user_info)
+            refreshToken = user.dtRefreshToken
+
+            if refreshToken and decode_jwt_token(refreshToken):
+                token = generate_jwt_token(payload=user_info)
             else:
                 refresh_token = generate_refresh_token(payload=user_info)
                 user.dtRefreshToken = refresh_token
                 user.dtRefreshToken_valid_until = datetime.now(timezone.utc) + timedelta(days=1)
                 token = generate_jwt_token(payload=user_info)
 
-            db.session.commit()
+                loginValues = (data['dtEmail'], refresh_token)
+
+                db.session.commit(loginValues)
+                db.session.commit()
+
+                call_stored_procedure_post("""InsertRefreshToken
+                                            @email = ?,
+                                            @refreshToken = ?, """, loginValues)
 
             return jsonify({'message': 'Logged in successfully', 'token': token}), 200
+
         else:
             user.dtFailedLoginAttemps += 1
 
@@ -93,12 +101,12 @@ def register():
         dtEmail_with_code = data['dtEmail'] + code
 
         new_user = Account(
-            dtEmail=data['dtEmail'],
-            dtPassword=generate_password_hash(data['dtPassword']),
-            isAccountBlocked=bool(data['isAccountBlocked']),
-            dtIsAdmin=bool(data['isAdmin']),
-            fiSubscription=1,
-            fiLanguage=1
+                dtEmail=data['dtEmail'],
+                dtPassword=generate_password_hash(data['dtPassword']),
+                isAccountBlocked=bool(data['isAccountBlocked']),
+                dtIsAdmin=bool(data['isAdmin']),
+                fiSubscription=1,
+                fiLanguage=1,
         )
 
         refresh_token = generate_refresh_token(payload={"idAccount": new_user.idAccount, "dtEmail": data['dtEmail']})
@@ -108,6 +116,15 @@ def register():
         db.session.commit()
 
         code_data = (code, dtEmail_with_code)
+
+        new_user.append(code_data)
+
+        call_stored_procedure_post("""InsertCode
+                                    @dtEmail = ?,
+                                    @dtPassword = ?,
+                                    @fiSubscription = ?,
+                                    @fiLanguage = ?,
+                                    @dtRefreshToken = ?""", new_user)
 
         end_message = call_stored_procedure_post("""InsertCode 
                                                             @Code = ? ,

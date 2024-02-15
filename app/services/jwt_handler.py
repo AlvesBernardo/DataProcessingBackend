@@ -28,6 +28,7 @@ def generate_token(payload, lifetime, algorithm):
 
 def decode_jwt_token(token):
     try:
-        return jwt.decode(token, os.environ.get('SECRET_KEY'), algorithms=["HS256"])
+        jwt.decode(token, os.environ.get('SECRET_KEY'), algorithms=["HS256"])
+        return True
     except Exception as e:
         raise Exception(f'Invalid access token: {e}')
