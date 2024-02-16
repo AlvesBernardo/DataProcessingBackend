@@ -139,19 +139,6 @@ def register():
                  'code': code, 'email': dtEmail_with_code}), 409
 
 
-@security.route('/sendEmail')
-def sendingEmail(recieverEmail, subject, body):
-    """
-    Sends an email to the specified receiver email address.
-
-    :param recieverEmail: The email address of the receiver.
-    :param subject: The subject of the email.
-    :param body: The body content of the email.
-    :return: None
-    """
-    send_email(recieverEmail, subject, body)
-
-
 @security.route('/forgot-password', methods=['POST'])
 def forgot_password():
     """
