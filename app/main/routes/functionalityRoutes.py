@@ -84,6 +84,7 @@ def pause_movie(profile_id,movie_id):
 @functionality_routes.route('/get_times_played/<int:movieId>')
 @auth_guard()
 def getHowManyTimesMoviePlayed(movieId):
+    movieId = int(movieId)
     timesPlayed = TimesPlayed.query.filter_by(fiMovie = movieId).first()
     if timesPlayed :
         return jsonify({"mesage": "timesPlayed.dtPlayCount"})
