@@ -5,8 +5,9 @@ from app.main.routes.securityRoutes import security
 from app.main.routes.userRoutes import user_route
 from app.main.routes.movieRoutes import movie_routes
 from app.main.routes.functionalityRoutes import functionality_routes
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = engine.url  # Use the configured database URL
+app.config['SQLALCHEMY_DATABASE_URI'] = engine.url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 db.init_app(app)

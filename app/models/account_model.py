@@ -1,8 +1,7 @@
 from sqlalchemy.orm import relationship
 from app.extensions import db
-from .subscription_model import  Subcription
-from .language_model import Language
-from datetime import datetime
+
+
 class Account(db.Model):
     __tablename__ = 'tblAccount'
     idAccount = db.Column(db.Integer, primary_key=True)
@@ -17,5 +16,6 @@ class Account(db.Model):
     dtFailedLoginAttemps = db.Column(db.Integer, nullable=False, default=0)
     dtAccountBlockedTill = db.Column(db.Date, nullable=True)
     dtRefreshToken = db.Column(db.String(512), nullable=False)
+
     def repr(self):
         return '<Account %r>' % self.idAccount

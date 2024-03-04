@@ -11,7 +11,6 @@ sender_email = os.getenv("SENDER_EMAIL_ADDRESS")
 
 def send_email(receiver_email, subject, body):
     mailjet = Client(auth=(api_key, api_secret), version='v3.1')
-
     data = {
         'Messages': [
             {
@@ -33,6 +32,3 @@ def send_email(receiver_email, subject, body):
     }
 
     mailjet.send.create(data=data)
-
-# Use the function
-# send_email("receiver_email@example.com")

@@ -1,10 +1,12 @@
 import sys
+
 sys.path.append("..")
 import datetime
 import unittest
 from src.View import View
 from src.Subtitle import Subtitle
 from src.Movie import Movie
+
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
@@ -45,6 +47,7 @@ class ViewTests(unittest.TestCase):
         newSubtitle = Subtitle("French", "Subtitle content")
         self.view.setSubtitleOn(newSubtitle)
         self.assertEqual(self.view.getSubtitle(), newSubtitle)
+
 
 if __name__ == '__main__':
     unittest.main()

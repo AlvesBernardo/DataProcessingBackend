@@ -1,10 +1,9 @@
 from app.extensions import db
 from sqlalchemy.orm import relationship
-from .subtitle_model import Subtitle
-from .movie_model import Movie
-from .profile_model import Profile
-class View(db.Model) : 
-    __tablename__ = 'tblView'  # Specify the table name
+
+
+class View(db.Model):
+    __tablename__ = 'tblView'
     idView = db.Column(db.Integer, primary_key=True)
     fiSubtitle = db.Column(db.Integer, db.ForeignKey("tblSubtitle.idSubtitle"))
     subtitle = relationship("Subtitle")
@@ -13,5 +12,6 @@ class View(db.Model) :
     fiProfile = db.Column(db.Integer, db.ForeignKey("tblProfile.idProfile"))
     profile = relationship("Profile")
     dtMovieTime = db.Column(db.DateTime, nullable=False)
+
     def __repr__(self):
         return '<View %r>' % self.idView
