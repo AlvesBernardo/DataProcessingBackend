@@ -32,6 +32,8 @@ def get_multiple_objects(query_list,attribute_list:list) :
 @user_route.route('/users/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard('admin')
 def manage_users(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             user = Account.query.get(id)
@@ -81,6 +83,8 @@ def manage_users(id=None):
 @user_route.route('/subscriptions/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard
 def manage_subscriptions(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         current_user_id = check_jwt_token()
         account_details = call_stored_procedure_get("""
@@ -113,10 +117,9 @@ def manage_subscriptions(id=None):
                                                                 @QualityType = ? 
                                                                 """, new_profile_data)
         if not end_message:
-            return jsonify({'message': 'new quality added'}),201
+            return jsonify({'message': 'new Subscription added'}),201
         else:
-            return jsonify({'message': 'quality could not be added', 'error_message': end_message}),406
-        return jsonify({'message': 'new subscription added'})
+            return jsonify({'message': 'Subscription could not be added', 'error_message': end_message}),406
     elif request.method == 'DELETE':
         subscription = Subcription.query.get(id)
         if not subscription:
@@ -131,6 +134,8 @@ def manage_subscriptions(id=None):
 @user_route.route('/languages/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard('admin')
 def manage_languages(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             language = Language.query.get(id)
@@ -173,6 +178,8 @@ def manage_languages(id=None):
 @user_route.route('/profiles/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def manage_profiles(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             profile = Profile.query.get(id)
@@ -221,6 +228,8 @@ def manage_profiles(id=None):
 @user_route.route('/views/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def manage_views(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             view = View.query.get(id)
@@ -278,6 +287,8 @@ def manage_views(id=None):
 @user_route.route('/watchlist/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def handle_watchlist(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             watchlist = WatchList.query.get(id)

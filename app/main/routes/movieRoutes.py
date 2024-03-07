@@ -23,12 +23,11 @@ def convert_to_csv(header:list,data:list) :
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_classifications(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
-            if isinstance(id, int):
-                classification_data = {'id': id, 'description': 'Example Classification'}
-            else :
-                return jsonify({'message': 'Invalid id type'}), 400
+            return jsonify({'message': 'Invalid id type'}), 400
         else:
             classification_data = [{'id': 1, 'description': 'Classification 1'},
                                    {'id': 2, 'description': 'Classification 2'}]
@@ -62,6 +61,8 @@ def manage_classifications(id=None):
 @movie_routes.route('/genres', methods=['GET', 'POST'])
 @movie_routes.route('/genres/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_genres(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
             genre = Genre.query.get(id)
@@ -112,6 +113,8 @@ def manage_genres(id=None):
 @movie_routes.route('/movies/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard()
 def manage_movies(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
             movie = Movie.query.get(id)
@@ -177,7 +180,8 @@ def manage_movies(id=None):
 @movie_routes.route('/qualities/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard()
 def manage_qualities(id=None):
-
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
             quality = Quality.query.get(id)
@@ -240,7 +244,8 @@ def manage_qualities(id=None):
 @movie_routes.route('/subtitles/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard()
 def manage_subtitles(id=None):
-
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
             subtitle = Subtitle.query.get(id)
