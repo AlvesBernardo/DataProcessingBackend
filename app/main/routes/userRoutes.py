@@ -59,8 +59,11 @@ def manage_users(id=None):
         end_message = call_stored_procedure_post("""InsertAccount
                                                                 @dtEmail = ? ,
                                                                 @dtPassword = ? ,
+                                                                @dtIsAdmin = ? ,
                                                                 @fiSubscription = ? , 
-                                                                @fiLanguage = ? """, new_classification_data)
+                                                                @fiLanguage = ? ,
+                                                                @dtRefreshtoken = ? , """,
+                                                                new_classification_data)
         if not end_message:
             return jsonify({'message': 'new account added'})
         else:
