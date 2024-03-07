@@ -4,7 +4,6 @@ from app.config.connection_configuration import engine, quality_table
 
 imageType_controller = Blueprint('quality', __name__)
 
-##Only allow select queries while using orm
 @imageType_controller.route('/quality', methods=['GET'])
 def imageType_controller():
     Session = sessionmaker(bind=engine)

@@ -1,6 +1,7 @@
-
 from sqlalchemy.orm import relationship
 from app.extensions import db
+
+
 class Account(db.Model):
     __tablename__ = 'dbo.tblAccount'
     idAccount = db.Column(db.Integer, primary_key=True)
@@ -8,12 +9,14 @@ class Account(db.Model):
     dtPassword = db.Column(db.String(255), nullable=False)
     isAccountBlocked = db.Column(db.Boolean, nullable=False, default=False)
     dtIsAdmin = db.Column(db.Boolean, nullable=False, default=False)
-    #fiSubscription = db.relationship("Subscription", backref="Account")  # Adjust relationship names
     fiLanguage_id = db.Column(db.Integer, db.ForeignKey('dbo.tblLanguage.idLanguage'))
     fiLanguage = relationship("Language", back_populates="accounts")
+
     def save(self):
         db.session.add(self)
-        db.session.commit()        
+        db.session.commit()
+
+
 class Language(db.Model):
     __tablename__ = 'dbo.tblLanguage'
     idLanguage = db.Column(db.Integer, primary_key=True)

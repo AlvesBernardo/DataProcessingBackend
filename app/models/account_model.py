@@ -15,5 +15,6 @@ class Account(db.Model):
     dtFailedLoginAttemps = db.Column(db.Integer, nullable=False, default=0)
     dtAccountBlockedTill = db.Column(db.Date, nullable=True)
     dtRefreshToken = db.Column(db.String(512), nullable=False)
+
     def repr(self):
         return '<Account %r>' % self.idAccount

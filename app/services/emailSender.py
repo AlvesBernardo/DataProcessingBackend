@@ -10,30 +10,25 @@ sender_email = os.getenv("SENDER_EMAIL_ADDRESS")
 
 
 def send_email(receiver_email, subject, body):
-  mailjet = Client(auth=(api_key, api_secret), version='v3.1')
+    mailjet = Client(auth=(api_key, api_secret), version='v3.1')
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": sender_email,
+                    "Name": "Me"
+                },
+                "To": [
+                    {
+                        "Email": receiver_email,
+                        "Name": "Netflix project"
+                    }
+                ],
+                "Subject": subject,
+                "TextPart": "Greetings from Netflix!",
+                "HTMLPart": body
+            }
+        ]
+    }
 
-  data = {
-    'Messages': [
-      {
-        "From": {
-          "Email": sender_email,
-          "Name": "Me"
-        },
-        "To": [
-          {
-            "Email": receiver_email,
-            "Name": "Netflix project"
-          }
-        ],
-        "Subject": subject,
-        "TextPart": "Greetings from Netflix!",
-        "HTMLPart": body
-      }
-    ]
-  }
-
-  result = mailjet.send.create(data=data)
-  print(result.status_code)
-  print(result.json())
-
-
+    mailjet.send.create(data=data)

@@ -1,8 +1,8 @@
 import unittest
 import sys
-sys.path.append("..") # added!
 from src.Quality import Quality
 
+sys.path.append("..")
 
 
 class TestQualityClass(unittest.TestCase):
@@ -19,5 +19,6 @@ class TestQualityClass(unittest.TestCase):
         self.assertEqual(quality.get_description(), "SD")
         self.assertEqual(quality.get_price(), 7.99)
 
-if __name__ == '__main__':  ##this will check if the script is being ran as teh main program
+
+if __name__ == '__main__':
     unittest.main()

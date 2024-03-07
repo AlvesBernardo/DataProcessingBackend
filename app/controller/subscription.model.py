@@ -2,10 +2,9 @@ from flask import Blueprint, jsonify
 from sqlalchemy.orm import sessionmaker
 from app.config.connection_configuration import engine, subscription_table
 
-
 subscription_controller = Blueprint('subscription', __name__)
 
-##with this code the user can get his subscription
+
 @subscription_controller.route('/subscription/<int:user_id>', methods=['GET'])
 def get_subscription(user_id):
     Session = sessionmaker(bind=engine)
