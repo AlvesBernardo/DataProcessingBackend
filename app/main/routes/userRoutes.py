@@ -25,7 +25,7 @@ def get_multiple_objects(query_list,attribute_list:list) :
             output.append(object_data)
         except Exception as e :
             return jsonify({'message': f'Error: {e}'}), 500
-    return jsonify({'results':output})
+    return jsonify({'results':output}),200
 
         
 @user_route.route('/users', methods=['GET', 'POST'])
@@ -65,16 +65,16 @@ def manage_users(id=None):
                                                                 @dtRefreshtoken = ? , """,
                                                                 new_classification_data)
         if not end_message:
-            return jsonify({'message': 'new account added'})
+            return jsonify({'message': 'new account added'}),201
         else:
-            return jsonify({'message': 'account could not be added', 'error_message': end_message})
+            return jsonify({'message': 'account could not be added', 'error_message': end_message}),406
     elif request.method == 'DELETE':
         user = Account.query.get(id)
         error_message = call_stored_procedure_post("DeleteAccountAndRelatedContent @AccountID = ? ", (id,))
         if not error_message:
-            return jsonify({'message': 'account deleted'})
+            return jsonify({'message': 'account deleted'}),200
         else:
-            return jsonify({'message': 'account could not be deleted', 'error_message': error_message})
+            return jsonify({'message': 'account could not be deleted', 'error_message': error_message}),406
 
 
 @user_route.route('/subscriptions', methods=['GET', 'POST'])
@@ -113,9 +113,9 @@ def manage_subscriptions(id=None):
                                                                 @QualityType = ? 
                                                                 """, new_profile_data)
         if not end_message:
-            return jsonify({'message': 'new quality added'})
+            return jsonify({'message': 'new quality added'}),201
         else:
-            return jsonify({'message': 'quality could not be added', 'error_message': end_message})
+            return jsonify({'message': 'quality could not be added', 'error_message': end_message}),406
         return jsonify({'message': 'new subscription added'})
     elif request.method == 'DELETE':
         subscription = Subcription.query.get(id)
@@ -124,7 +124,7 @@ def manage_subscriptions(id=None):
         db.session.delete(subscription)
         db.session.commit()
 
-        return jsonify({'message': 'subscription has been deleted'})
+        return jsonify({'message': 'subscription has been deleted'}),200
 
 
 @user_route.route('/languages', methods=['GET', 'POST'])
@@ -141,7 +141,7 @@ def manage_languages(id=None):
                 'dtDescription': language.dtDescription
             }
 
-            return jsonify(language_data)
+            return jsonify(language_data),200
         else:
             languages = Language.query.all()
             return get_multiple_objects(languages,['idLanguage','dtDescription'])
@@ -155,9 +155,9 @@ def manage_languages(id=None):
                                                                 """,
                                                  new_subscription_data)
         if not end_message:
-            return jsonify({'message': 'new Language added'})
+            return jsonify({'message': 'new Language added'}),201
         else:
-            return jsonify({'message': 'Language could not be added', 'error_message': end_message})
+            return jsonify({'message': 'Language could not be added', 'error_message': end_message}),406
     elif request.method == 'DELETE':
         language = Language.query.get(id)
         if not language:
@@ -166,7 +166,7 @@ def manage_languages(id=None):
         db.session.delete(language)
         db.session.commit()
 
-        return jsonify({'message': 'language has been deleted'})
+        return jsonify({'message': 'language has been deleted'}),200
 
 
 @user_route.route('/profiles', methods=['GET', 'POST'])
@@ -205,9 +205,9 @@ def manage_profiles(id=None):
                                                                 @Genre = ? 
                                                                 """, new_language_data)
         if not end_message:
-            return jsonify({'message': 'new profile added'})
+            return jsonify({'message': 'new profile added'}), 201
         else:
-            return jsonify({'message': 'profile could not be added', 'error_message': end_message})
+            return jsonify({'message': 'profile could not be added', 'error_message': end_message}), 406
     elif request.method == 'PUT':
         data = request.get_json()
         profile = Profile.query.get(id)
@@ -234,7 +234,7 @@ def manage_views(id=None):
                 'fiMovie': view.fiMovie,
                 'fiProfile': view.fiProfile
             }
-            return jsonify(view_data)
+            return jsonify(view_data),200
         else:
             views = View.query.all()
             return get_multiple_objects(views,['idView','dtMovieTime','fiSubtitle','fiMovie','fiProfile'])
@@ -249,9 +249,9 @@ def manage_views(id=None):
                                                                 @MovieTime = ? 
                                                                 """, new_profile_data)
         if not end_message:
-            return jsonify({'message': 'new view added'})
+            return jsonify({'message': 'new view added'}), 201
         else:
-            return jsonify({'message': 'view could not be added', 'error_message': end_message})
+            return jsonify({'message': 'view could not be added', 'error_message': end_message}),406
     elif request.method == 'PUT':
         data = request.get_json()
         view = View.query.get(id)
@@ -267,11 +267,11 @@ def manage_views(id=None):
 
         db.session.commit()
 
-        return jsonify({'message': 'View updated'})
+        return jsonify({'message': 'View updated'}),200
     elif request.method == 'DELETE':
         view = View.query.get(id)
         if not view:
-            return jsonify({'message': 'No View found!'})
+            return jsonify({'message': 'No View found!'}),404
 
 
 @user_route.route('/watchlist', methods=['GET', 'POST'])
@@ -297,7 +297,7 @@ def handle_watchlist(id=None):
         if not end_message:
             return jsonify({'message': 'new watchlist added'}), 201
         else:
-            return jsonify({'message': 'watchlist could not be added', 'error_message': end_message})
+            return jsonify({'message': 'watchlist could not be added', 'error_message': end_message}),406
     elif request.method == 'PUT':
         data = request.get_json()
         watchlist = WatchList.query.get(id)
@@ -306,13 +306,13 @@ def handle_watchlist(id=None):
         if 'fiProfile' in data:
             watchlist.fiProfile = data['fiProfile']
         db.session.commit()
-        return jsonify(watchlist.serialize())
+        return jsonify(watchlist.serialize()), 200
     elif request.method == 'DELETE':
         watchlist = WatchList.query.get(id)
         if watchlist is None:
             return jsonify(f'Watchlist with Id {id} does not exist'), 404
         db.session.delete(watchlist)
         db.session.commit()
-        return '', 204
+        return jsonify(f'Watchlist with Id {id} has been deleted'), 200
     else:
         return jsonify(f'Invalid request method'), 405
