@@ -27,6 +27,8 @@ def manage_classifications(id=None):
         if id:
             if isinstance(id, int):
                 classification_data = {'id': id, 'description': 'Example Classification'}
+            else :
+                return jsonify({'message': 'Invalid id type'}), 400
         else:
             classification_data = [{'id': 1, 'description': 'Classification 1'},
                                    {'id': 2, 'description': 'Classification 2'}]
