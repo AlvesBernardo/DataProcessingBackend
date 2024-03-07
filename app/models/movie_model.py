@@ -1,7 +1,6 @@
 from app.extensions import db
 from sqlalchemy.orm import relationship
 
-
 class Movie(db.Model):
     __tablename__ = 'tblMovie'
     idMovie = db.Column(db.Integer, primary_key=True)
@@ -21,4 +20,4 @@ class Movie(db.Model):
     genre = relationship("Genre")
 
     def __repr__(self):
-        return '<View %r>' % self.idMovie
+        return '<Movie %r>' % self.idMovie

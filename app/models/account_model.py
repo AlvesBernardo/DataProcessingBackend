@@ -16,5 +16,5 @@ class Account(db.Model):
     dtAccountBlockedTill = db.Column(db.Date, nullable=True)
     dtRefreshToken = db.Column(db.String(512), nullable=False)
 
-    def repr(self):
+    def __repr__(self):
         return '<Account %r>' % self.idAccount
