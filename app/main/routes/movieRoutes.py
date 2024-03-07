@@ -13,7 +13,12 @@ from dateutil.parser import parse
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
-
+def convert_to_csv(header:list,data:list) :
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(header)
+    cw.writerows(data)
+    return si.getvalue()
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_classifications(id=None):
@@ -30,11 +35,8 @@ def manage_classifications(id=None):
         # Check 'Accept' header for response type
         if 'text/csv' in request.headers.get('Accept', ''):
             # Convert response data to CSV
-            si = io.StringIO()
-            cw = csv.writer(si)
-            cw.writerow(['id', 'description'])  # Header
-            cw.writerows([classification['id'], classification['description']] for classification in classification_data)
-            output = si.getvalue()
+            data = [[classification['id'], classification['description']] for classification in classification_data]
+            output = convert_to_csv(['id', 'description'],data)
             return Response(output, mimetype='text/csv')
         else:
             # Return JSON
@@ -86,11 +88,9 @@ def manage_genres(id=None):
 
         # Response type handling
         if 'text/csv' in request.headers.get('Accept', ''):
-            si = io.StringIO()
-            cw = csv.writer(si)
-            cw.writerow(['idGenre', 'dtDescription'])
-            cw.writerows([[genre['idGenre'], genre['dtDescription']] for genre in genre_data])
-            output = si.getvalue()
+            
+            data = [[genre['idGenre'], genre['dtDescription']] for genre in genre_data]
+            output = convert_to_csv(['idGenre', 'dtDescription'], data)
             return Response(output, mimetype='text/csv')
         else:
             return jsonify({'genres': genre_data})
@@ -183,7 +183,6 @@ def manage_movies(id=None):
     elif request.method == 'PUT':
         data = request.get_json()
         movie = Movie.query.get(id)
-
         if not movie:
             return jsonify({'message': 'No movie found!'}), 404
 

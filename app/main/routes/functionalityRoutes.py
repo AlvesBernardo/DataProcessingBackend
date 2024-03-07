@@ -12,7 +12,18 @@ from app.services.auth_guard import auth_guard
 
 functionality_routes = Blueprint('functionality_routes', __name__)
 s = URLSafeTimedSerializer('secret')
-
+def calculate_final_time(time_played:datetime):
+    hours, remainder = divmod(time_played.total_seconds(), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    time_object = time(int(hours), int(minutes), int(seconds))
+    return time_object
+def update_date_time(view:View,time_played:datetime):
+    reference_date = datetime.date.today()
+    datetime_obj = datetime.datetime.combine(reference_date, view.dtMovieTime)
+    updated_datetime = datetime_obj + time_played
+    view.dtMovieTime = updated_datetime.time()
+    # update the view.dtMovieTime
+    db.session.commit()
 play_time_counter = {}
 @functionality_routes.route('/play_movie/<int:profile_id>/<int:movie_id>')
 @auth_guard()
@@ -47,10 +58,7 @@ def pause_movie(profile_id,movie_id):
         view = View.query.filter_by(fiMovie = movie_id, fiProfile = profile_id).first()
         play_time_counter.pop(profile_id)
         if view == None :
-            hours, remainder = divmod(time_played.total_seconds(), 3600)
-            minutes, seconds = divmod(remainder, 60)
-            time_object = time(int(hours), int(minutes), int(seconds))
-            new_profile_data = (4, movie_id,profile_id, time_object)
+            new_profile_data = (4, movie_id,profile_id, calculate_final_time(time_played))
             end_message = call_stored_procedure_post("""InsertView
                                                                                                 @SubtitleID = ?,
                                                                                                 @MovieID = ? ,
@@ -63,17 +71,8 @@ def pause_movie(profile_id,movie_id):
             else:
                 return jsonify({'message': 'view could not be added', 'error_message': end_message})
         else :
-            reference_date = datetime.date.today()
-            datetime_obj = datetime.datetime.combine(reference_date, view.dtMovieTime)
-            updated_datetime = datetime_obj + time_played
-
-            view.dtMovieTime = updated_datetime.time()
-            # update the view.dtMovieTime
-
-            db.session.commit()
-
+            update_date_time(view,time_played)
             return jsonify({'message ' : f"you have watched {view.dtMovieTime} of the movie and now {time_played}"})
-
     else :
         return jsonify({'message' : 'movie cannot be stopped at the moment'})
 

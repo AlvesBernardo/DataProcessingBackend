@@ -14,6 +14,19 @@ from app.extensions import call_stored_procedure_post ,call_stored_procedure_get
 user_route = Blueprint('user', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
+def get_multiple_objects(query_list,attribute_list:list) :
+    output = []
+    for object in query_list :
+        object_data = {}
+        try :
+            for attribute in attribute_list :
+                object_data[attribute] = getattr(object,attribute)
+            output.append(object_data)
+        except Exception as e :
+            return jsonify({'message': f'Error: {e}'}), 500
+    return jsonify({'results':output})
+
+        
 @user_route.route('/users', methods=['GET', 'POST'])
 @user_route.route('/users/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard('admin')
@@ -44,20 +57,7 @@ def manage_users(id=None):
 
         else:
             users = Account.query.all()
-            output = []
-
-            for user in users:
-                user_data = {
-                    'idAccount': user.idAccount,
-                    'dtEmail': user.dtEmail,
-                    'isAccountBlocked': user.isAccountBlocked,
-                    'dtIsAdmin': user.dtIsAdmin,
-                    'fiSubscription': user.fiSubscription,
-                    'fiLanguage': user.fiLanguage
-                }
-                output.append(user_data)
-
-            return jsonify({'users': output})
+            return get_multiple_objects(users,['idAccount','dtEmail','isAccountBlocked','dtIsAdmin','fiSubscription','fiLanguage'])
 
     elif request.method == 'POST':
         data = request.get_json()
@@ -117,7 +117,6 @@ def manage_subscriptions(id=None):
     """
     if request.method == 'GET':
         current_user_id = check_jwt_token()
-
         # Call the stored procedure with the user's ID
         account_details = call_stored_procedure_get("""
             GetAccountDetails
@@ -216,16 +215,8 @@ def manage_languages(id=None):
 
         else:
             languages = Language.query.all()
-            output = []
-
-            for language in languages:
-                language_data = {
-                    'idLanguage': language.idLanguage,
-                    'dtDescription': language.dtDescription
-                }
-                output.append(language_data)
-
-            return jsonify({'languages': output})
+            return get_multiple_objects(languages,['idLanguage','dtDescription'])
+            
 
     elif request.method == 'POST':
         data = request.get_json()
@@ -278,21 +269,7 @@ def manage_profiles(id=None):
 
         else:
             profiles = Profile.query.all()
-            output = []
-
-            for profile in profiles:
-                profile_data = {
-                    'idProfile': profile.idProfile,
-                    'dtName': profile.dtName,
-                    'dtMinor': profile.dtMinor,
-                    'dtProfileImage': profile.dtProfileImage,
-                    'fiAccount': profile.fiAccount,
-                    'fiGenre': profile.fiGenre
-                }
-                output.append(profile_data)
-
-            return jsonify({'profiles': output})
-
+            return get_multiple_objects(profiles,['idProfile','dtName','dtMinor','dtProfileImage','fiAccount','fiGenre'])
     elif request.method == 'POST':
         data = request.get_json()
         new_language_data = (data['Name'],data['IsMinor'],data['ProfileImage'],data['IsAccountDisabled'],data['AccountID'],data['Genre']
@@ -349,18 +326,7 @@ def manage_views(id=None):
 
         else:  # if id is not provided, return all views
             views = View.query.all()
-            output = []
-            for view in views:
-                view_data = {
-                    'idView': view.idView,
-                    'dtMovieTime': view.dtMovieTime.isoformat(),
-                    'fiSubtitle': view.fiSubtitle,
-                    'fiMovie': view.fiMovie,
-                    'fiProfile': view.fiProfile
-                }
-                output.append(view_data)
-
-            return jsonify({'views': output})
+            return get_multiple_objects(views,['idView','dtMovieTime','fiSubtitle','fiMovie','fiProfile'])
 
     elif request.method == 'POST':
         data = request.get_json()
