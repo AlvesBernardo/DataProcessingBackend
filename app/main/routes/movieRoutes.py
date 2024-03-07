@@ -25,7 +25,8 @@ def convert_to_csv(header:list,data:list) :
 def manage_classifications(id=None):
     if request.method == 'GET':
         if id:
-            classification_data = {'id': id, 'description': 'Example Classification'}
+            if isinstance(id, int):
+                classification_data = {'id': id, 'description': 'Example Classification'}
         else:
             classification_data = [{'id': 1, 'description': 'Classification 1'},
                                    {'id': 2, 'description': 'Classification 2'}]
