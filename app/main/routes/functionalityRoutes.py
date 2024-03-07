@@ -37,10 +37,10 @@ def play_movie(profile_id, movie_id):
     if profile is None or movie is None:
         return jsonify({"message": "data not found"}), 404
     if profile_id in play_time_counter:
-        return jsonify({"message": "movie cannot be played at the moment"})
+        return jsonify({"message": "movie cannot be played at the moment"}),423
     else:
         play_time_counter[profile_id] = {"movie": movie_id, "start_counter": datetime.datetime.now()}
-        return jsonify({"message": "movie played successfully"})
+        return jsonify({"message": "movie played successfully"}),200
 
 
 @functionality_routes.route('/pause_movie/<int:profile_id>/<int:movie_id>/', methods=['GET', 'POST'])
@@ -54,7 +54,7 @@ def pause_movie(profile_id, movie_id):
         return jsonify({"message": "data not found"}), 404
     if profile_id in play_time_counter:
         if not play_time_counter[profile_id]["movie"] == movie_id:
-            return jsonify({"message": "This movie is not currently playing failed_login_attempts"})
+            return jsonify({"message": "This movie is not currently playing failed_login_attempts"}),401
         time_played = datetime.datetime.now() - play_time_counter[profile_id]["start_counter"]
         view = View.query.filter_by(fiMovie=movie_id, fiProfile=profile_id).first()
         play_time_counter.pop(profile_id)
@@ -68,14 +68,14 @@ def pause_movie(profile_id, movie_id):
                                                                     """, new_profile_data)
 
             if not end_message:
-                return jsonify({'message': 'new view added'})
+                return jsonify({'message': 'new view added'}),201
             else:
-                return jsonify({'message': 'view could not be added', 'error_message': end_message})
+                return jsonify({'message': 'view could not be added', 'error_message': end_message}),406
         else :
             update_date_time(view,time_played)
-            return jsonify({'message ' : f"you have watched {view.dtMovieTime} of the movie and now {time_played}"})
+            return jsonify({'message ' : f"you have watched {view.dtMovieTime} of the movie and now {time_played}"}),200
     else :
-        return jsonify({'message' : 'movie cannot be stopped at the moment'})
+        return jsonify({'message' : 'movie cannot be stopped at the moment'}),423
 
 
 @functionality_routes.route('/get_times_played/<int:movieId>')
@@ -84,6 +84,6 @@ def getHowManyTimesMoviePlayed(movieId):
     movieId = int(movieId)
     timesPlayed = TimesPlayed.query.filter_by(fiMovie=movieId).first()
     if timesPlayed:
-        return jsonify({"mesage": "timesPlayed.dtPlayCount"})
+        return jsonify({"mesage": "timesPlayed.dtPlayCount"}),200
     else:
-        return jsonify({"mesage": "0 times played"})
+        return jsonify({"mesage": "0 times played"}),200
