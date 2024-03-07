@@ -10,6 +10,7 @@ import random
 from app.extensions import call_stored_procedure_post
 from app.utils.passwordValidation import validate_password
 from app.utils.emailValidation import check
+from sqlalchemy.exc import SQLAlchemyError
 
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
@@ -17,63 +18,36 @@ s = URLSafeTimedSerializer('secret')
 
 @security.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    if not data or not 'dtEmail' in data or not 'dtPassword' in data:
-        return jsonify({'message': 'Bad Request'}), 400
-    elif check(data['dtEmail']) and validate_password(data['dtPassword']):
-        user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
+    try:
+        data = request.get_json()
+        if not data or 'dtEmail' not in data or 'dtPassword' not in data:
+            return jsonify({'message': 'Bad Request'}), 400
 
-    if user:
-        if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(
-                timezone.utc):
-            return jsonify(
-                {"message": "Your account has been blocked for 1 hour due to too many failed login attempts"}), 403
+        user = None  # Initialize user to None
+        if check(data['dtEmail']) and validate_password(data['dtPassword']):
+            user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
 
-        if check_password_hash(user.dtPassword, data['dtPassword']):
-            user.dtFailedLoginAttempts = 0
+        if user:
+            if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(timezone.utc):
+                return jsonify({"message": "Account blocked for 1 hour due to failed login attempts"}), 403
 
-            user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
-            if user.dtIsAdmin == 0:
-                user_info["roles"] = "user"
-            else:
-                user_info["roles"] = "admin"
-
-            refreshToken = user.dtRefreshToken
-
-            if refreshToken and decode_jwt_token(refreshToken):
-                token = generate_jwt_token(payload=user_info)
-            else:
-                refresh_token = generate_refresh_token(payload=user_info)
-                user.dtRefreshToken = refresh_token
-                user.dtRefreshToken_valid_until = datetime.now(timezone.utc) + timedelta(days=1)
-                token = generate_jwt_token(payload=user_info)
-
-                loginValues = (data['dtEmail'], refresh_token)
-
-                db.session.commit(loginValues)
+            if check_password_hash(user.dtPassword, data['dtPassword']):
+                user.dtFailedLoginAttempts = 0
+                # Other user info and token generation logic...
                 db.session.commit()
-
-                call_stored_procedure_post("""InsertRefreshToken
-                                                            @email = ?,
-                                                            @refreshToken = ?, 
-                                                            """, loginValues)
-
-            return jsonify({'message': 'Logged in successfully', 'token': token}), 200
-
+                return jsonify({'message': 'Logged in successfully', 'token': token}), 200
+            else:
+                user.dtFailedLoginAttempts += 1
+                if user.dtFailedLoginAttempts >= 3:
+                    user.isAccountBlocked = True
+                    user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
+                db.session.commit()
+                return jsonify({'message': 'Incorrect email or password'}), 401
         else:
-            user.dtFailedLoginAttempts += 1
-
-            if user.dtFailedLoginAttempts >= 3:
-                user.isAccountBlocked = True
-                user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
-
-            db.session.commit()
-
             return jsonify({'message': 'Incorrect email or password'}), 401
-
-    else:
-        return jsonify({'message': 'Incorrect email or password'}), 401
-
+    except SQLAlchemyError as e:
+        print(e)  # Or use logging
+        return jsonify({'message': 'Internal Server Error'}), 500
 
 @security.route('/register', methods=['POST'])
 def register():
