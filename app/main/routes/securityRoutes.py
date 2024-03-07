@@ -13,8 +13,27 @@ from app.utils.emailValidation import check
 
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
+def check_if_account_is_blocked(user) : 
+    if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(timezone.utc) :
+                   return jsonify(
+                {"message": "Your account has been blocked for 1 hour due to too many failed login attempts"}), 403
+    else :
+        return None
+def generate_new_token(user_info,user):
+    refresh_token = generate_refresh_token(payload=user_info)
+    user.dtRefreshToken = refresh_token
+    user.dtRefreshToken_valid_until = datetime.now(timezone.utc) + timedelta(days=1)
+    token = generate_jwt_token(payload=user_info)
+    return (refresh_token,token)
+def failed_login_attempt(user) : 
+    user.dtFailedLoginAttempts += 1
+    if user.dtFailedLoginAttempts >= 3:
+        user.isAccountBlocked = True
+        user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
 
+    db.session.commit()
 
+    return jsonify({'message': 'Incorrect email or password'}), 401
 @security.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -22,32 +41,19 @@ def login():
         return jsonify({'message': 'Bad Request'}), 400
     elif check(data['dtEmail']) and validate_password(data['dtPassword']):
         user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
-
     if user:
-        if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(
-                timezone.utc):
-            return jsonify(
-                {"message": "Your account has been blocked for 1 hour due to too many failed login attempts"}), 403
-
+        message = check_if_account_is_blocked(user)
+        if message is not None :
+            return message
         if check_password_hash(user.dtPassword, data['dtPassword']):
             user.dtFailedLoginAttempts = 0
-
             user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
-            if user.dtIsAdmin == 0:
-                user_info["roles"] = "user"
-            else:
-                user_info["roles"] = "admin"
-
+            user_info["roles"] = "user" if user.dtIsAdmin == 0 else "admin"
             refreshToken = user.dtRefreshToken
-
             if refreshToken and decode_jwt_token(refreshToken):
                 token = generate_jwt_token(payload=user_info)
             else:
-                refresh_token = generate_refresh_token(payload=user_info)
-                user.dtRefreshToken = refresh_token
-                user.dtRefreshToken_valid_until = datetime.now(timezone.utc) + timedelta(days=1)
-                token = generate_jwt_token(payload=user_info)
-
+                (refresh_token,token) = generate_new_token(user_info,user)
                 loginValues = (data['dtEmail'], refresh_token)
 
                 db.session.commit(loginValues)
@@ -61,15 +67,7 @@ def login():
             return jsonify({'message': 'Logged in successfully', 'token': token}), 200
 
         else:
-            user.dtFailedLoginAttempts += 1
-
-            if user.dtFailedLoginAttempts >= 3:
-                user.isAccountBlocked = True
-                user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
-
-            db.session.commit()
-
-            return jsonify({'message': 'Incorrect email or password'}), 401
+           return failed_login_attempt(user)
 
     else:
         return jsonify({'message': 'Incorrect email or password'}), 401
