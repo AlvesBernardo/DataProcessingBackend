@@ -8,7 +8,11 @@
       <sourceFolder url="file://$MODULE_DIR$/app/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
+<<<<<<< HEAD
     <orderEntry type="jdk" jdkName="Python 3.11" jdkType="Python SDK" />
+=======
+    <orderEntry type="jdk" jdkName="Python 3.12" jdkType="Python SDK" />
+>>>>>>> origin/RefreshToken
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">

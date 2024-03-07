@@ -1,19 +1,35 @@
 import os
-import jwt
+from jwcrypto import jwk, jwt
+from jwcrypto.common import json_encode
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import sys
-# Load environment variables from .env file
-sys.path.append("..") # added!
-load_dotenv()
-def generate_jwt_token(payload,lifetime=None):
-    # Generates a new JWT token, wrapping information provided by payload (dict)
-    # Lifetime describes (in minutes) how much time the token will be valid
-    if lifetime:
-      payload["exp"] = (datetime.now() + timedelta(minutes=lifetime)).timestamp()
 
-    return jwt.encode(payload, os.environ.get('SECRET_KEY' ),algorithm="HS256")
-    # encoded = jwt.encode({"some": "payload", "exp": 1},os.environ.get("SECRET_KEY"), algorithm="HS256")
-    # return encoded
+sys.path.append("..")
+load_dotenv()
+
+
+def generate_jwt_token(payload,lifetime=60):
+    token = generate_token(payload, lifetime, "HS256")
+    return token
+
+def generate_refresh_token(payload,lifetime=2880):
+    token = generate_token(payload, lifetime, "HS256")
+    return token
+
+def generate_token(payload, lifetime, algorithm):
+    if lifetime:
+        payload["exp"] = (datetime.now() + timedelta(minutes=lifetime)).isoformat()
+
+    secret_key = os.environ.get('SECRET_KEY')
+    key = jwk.JWK(kty='oct', k=secret_key)
+    token = jwt.JWT(header={"alg": algorithm}, claims=payload)
+    token.make_signed_token(key)
+    return token.serialize()
+
 def decode_jwt_token(token):
-    return jwt.decode(token, os.environ.get('SECRET_KEY'), algorithms=["HS256"])
+    try:
+        jwt.decode(token, os.environ.get('SECRET_KEY'), algorithms=["HS256"])
+        return True
+    except Exception as e:
+        raise Exception(f'Invalid access token: {e}')
