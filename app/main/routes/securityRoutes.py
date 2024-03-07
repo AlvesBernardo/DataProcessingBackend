@@ -53,7 +53,7 @@ def login():
 def register():
     data = request.get_json()
 
-    if not data or not 'dtEmail' in data or not 'dtPassword' in data or not 'isAccountBlocked' in data or not 'isAdmin' or not 'fiSubscription' in data or not 'fiLanguage' in data:
+    if not data or not 'dtEmail' in data or not 'dtPassword' in data or not 'dtIsAdmin' in data or not 'fiSubscription' in data or not 'fiLanguage' in data or not 'dtRefreshToken' in data:
         return jsonify({'message': 'Bad Request'}), 400
     elif check(data['dtEmail']) and validate_password(data['dtPassword']):
         user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
@@ -87,6 +87,8 @@ def register():
             call_stored_procedure_post("""InsertCode
                                                         @dtEmail = ?,
                                                         @dtPassword = ?,
+                                                        @isAccountBlocked = ?,
+                                                        @dtIsAdmin = ?,
                                                         @fiSubscription = ?,
                                                         @fiLanguage = ?,
                                                         @dtRefreshToken = ?""", new_user)

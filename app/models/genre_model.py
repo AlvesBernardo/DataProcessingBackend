@@ -7,4 +7,4 @@ class Genre(db.Model):
     dtDescription = db.Column(db.String(255), nullable=False)
 
     def __repr__(self):
-        return '<Quality %r>' % self.idGenre
+        return '<Genre %r>' % self.idGenre
