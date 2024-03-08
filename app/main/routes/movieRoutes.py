@@ -3,6 +3,7 @@ from app.extensions import call_stored_procedure_get , call_stored_procedure_pos
 from flask import Blueprint, request, jsonify,Response
 from itsdangerous import URLSafeTimedSerializer
 from app.models.genre_model import Genre
+from app.models.classification_model import Classification
 from app.models.movie_model import Movie
 from app.models.quality_model import Quality
 from app.models.subtitle_model import Subtitle

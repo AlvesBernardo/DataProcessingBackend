@@ -10,7 +10,6 @@ def check_jwt_token(token=None):
         token = token.replace('Bearer ', '').strip()
     try:
         decoded_token = decode_jwt_token(token)
-        print(f"Decoded Token: {decoded_token}")
         return decoded_token
     except Exception as e:
         raise Exception(f'Invalid access token: {e}')

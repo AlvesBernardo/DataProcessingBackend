@@ -1,6 +1,7 @@
 from app.extensions import db
 from flask import Blueprint, request, jsonify
 from itsdangerous import URLSafeTimedSerializer
+from app.models.classification_model import Classification
 from app.models.account_model import Account
 from app.models.language_model import Language
 from app.models.profile_model import Profile

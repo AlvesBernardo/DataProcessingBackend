@@ -9,7 +9,6 @@ server_name = os.getenv("SERVER_NAME")
 database_name = os.getenv("DATABASE_NAME")
 username = os.getenv("DATABASE_USERNAME")
 password = os.getenv("DATABASE_PASSWORD")
-print(username, password)
 
 connection_url = f"mssql+pyodbc://{username}:{password}@{server_name}/{database_name}?driver=ODBC+Driver+17+for+SQL+Server"
 

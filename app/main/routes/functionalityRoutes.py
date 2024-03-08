@@ -2,6 +2,7 @@ from app.extensions import db
 from app.extensions import call_stored_procedure_post
 from flask import Blueprint, jsonify
 from itsdangerous import URLSafeTimedSerializer
+from app.models.classification_model import Classification
 from app.models.profile_model import Profile
 from app.models.movie_model import Movie
 from app.models.view_model import View

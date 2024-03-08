@@ -12,6 +12,7 @@ from app.utils.passwordValidation import validate_password
 from app.utils.emailValidation import check
 from sqlalchemy.exc import SQLAlchemyError
 
+
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
 def check_if_account_is_blocked(user) : 
@@ -28,8 +29,13 @@ def generate_new_token(user_info,user) :
     return (refresh_token, token)
 def handle_access_token(user_info,user,data):
     refreshToken = user.dtRefreshToken
-    if refreshToken and decode_jwt_token(refreshToken):
-        token = generate_jwt_token(payload=user_info)
+    if refreshToken:
+        try :
+            decoding_value = decode_jwt_token(refreshToken)
+            if decoding_value:
+                token = generate_jwt_token(payload=user_info) 
+        except:
+            token = generate_jwt_token(payload=user_info)
     else:
         (refresh_token, token) = generate_new_token(user_info,user)
         loginValues = (data['dtEmail'], refresh_token)
@@ -66,20 +72,15 @@ def login():
             if check_password_hash(user.dtPassword, data['dtPassword']):
                 user.dtFailedLoginAttempts = 0
                 user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
-                user_info['roles'] = "user" if user_info['isAdmin'] == 0 else "admin"
+                # user_info['roles'] = "user" if user_info['isAdmin'] == 0 else "admin"
                 token = handle_access_token(user_info,user,data)
                 # Other user info and token generation logic...
                 db.session.commit()
                 return jsonify({'message': 'Logged in successfully', 'token': token}), 200
             else:
-                user.dtFailedLoginAttempts += 1
-                if user.dtFailedLoginAttempts >= 3:
-                    user.isAccountBlocked = True
-                    user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
-                db.session.commit()
-                return jsonify({'message': 'Incorrect email or password'}), 401
+                failed_login_attempt(user)
         else:
-           return failed_login_attempt(user)
+           return jsonify({'message': 'This email is not registered on the website'}), 401
     except SQLAlchemyError as e:
         print(e)  # Or use logging
         return jsonify({'message': 'Internal Server Error'}), 500
@@ -90,21 +91,19 @@ def register():
     data = request.get_json()
 
     if not data or not 'dtEmail' in data or not 'dtPassword' in data or not 'dtIsAdmin' in data or not 'fiSubscription' in data or not 'fiLanguage' in data or not 'dtRefreshToken' in data:
-        return jsonify({'message': 'Bad Request'}), 400
+        return jsonify({'message': 'Bad Request'}),400
     elif check(data['dtEmail']) and validate_password(data['dtPassword']):
         user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
-
         if user:
-            return jsonify({"message": "User Already Exists. Please Login"}), 409
+            return jsonify({"message": "User Already Exists. Please Login"}),409
         else:
             code = "".join([str(random.randint(0, 9)) for _ in range(4)])
             dtEmail_with_code = data['dtEmail'] + code
-
             new_user = Account(
                 dtEmail=data['dtEmail'],
                 dtPassword=generate_password_hash(data['dtPassword']),
                 isAccountBlocked=bool(data['isAccountBlocked']),
-                dtIsAdmin=bool(data['isAdmin']),
+                dtIsAdmin=bool(data['dtIsAdmin']),
                 fiSubscription=1,
                 fiLanguage=1,
             )
@@ -118,7 +117,7 @@ def register():
 
             code_data = (code, dtEmail_with_code)
 
-            new_user.append(code_data)
+            # new_user.append(code_data)
 
             call_stored_procedure_post("""InsertCode
                                                         @dtEmail = ?,
