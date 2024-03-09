@@ -11,55 +11,10 @@ from app.extensions import call_stored_procedure_post
 from app.utils.passwordValidation import validate_password
 from app.utils.emailValidation import check
 from sqlalchemy.exc import SQLAlchemyError
-
+from .routeFunctions import *
 
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
-def check_if_account_is_blocked(user) : 
-    if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(timezone.utc) :
-                   return jsonify(
-                {"message": "Your account has been blocked for 1 hour due to too many failed login attempts"}), 403
-    else :
-        return None
-    
-
-def generate_new_token(user_info,user) :
-    refresh_token = generate_refresh_token(payload=user_info)
-    user.dtRefreshToken = refresh_token
-    user.dtRefreshToken_valid_until = datetime.now(timezone.utc) + timedelta(days=1)
-    token = generate_jwt_token(payload=user_info)
-    return (refresh_token, token)
-
-
-def handle_access_token(user_info,user,data):
-    refreshToken = user.dtRefreshToken
-    if refreshToken:
-        try :
-            decoding_value = decode_jwt_token(refreshToken)
-            if decoding_value:
-                token = generate_jwt_token(payload=user_info) 
-        except:
-            token = generate_jwt_token(payload=user_info)
-    else:
-        (refresh_token, token) = generate_new_token(user_info,user)
-        loginValues = (data['dtEmail'], refresh_token)
-        db.session.commit(loginValues)
-        db.session.commit()
-        call_stored_procedure_post("""InsertRefreshToken
-                                                        @email = ?,
-                                                        @refreshToken = ?, 
-                                                        """, loginValues)
-    return token
-def failed_login_attempt(user) : 
-    user.dtFailedLoginAttempts += 1
-    if user.dtFailedLoginAttempts >= 3:
-        user.isAccountBlocked = True
-        user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
-
-    db.session.commit() 
-
-    return jsonify({'message': 'Incorrect email or password'}), 401
-
 
 @security.route('/login', methods=['POST'])
 def login():
@@ -74,9 +29,8 @@ def login():
         else : 
             return jsonify({'message': 'Provided pasword or email is invalid'}), 401
         if user:
-            if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(timezone.utc):
+            if check_if_account_is_blocked(user) :
                 return jsonify({"message": "Account blocked for 1 hour due to failed login attempts"}), 403
-
             if check_password_hash(user.dtPassword, data['dtPassword']):
                 user.dtFailedLoginAttempts = 0
                 user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
