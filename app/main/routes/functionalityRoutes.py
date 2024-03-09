@@ -7,7 +7,6 @@ from app.models.profile_model import Profile
 from app.models.movie_model import Movie
 from app.models.view_model import View
 from app.models.timesPlayed_model import TimesPlayed
-import datetime
 from datetime import time
 from app.services.auth_guard import auth_guard
 from .routeFunctions import *
