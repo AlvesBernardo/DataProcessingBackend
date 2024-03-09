@@ -84,6 +84,7 @@ def login():
                 token = handle_access_token(user_info,user,data)
                 # Other user info and token generation logic...
                 db.session.commit()
+                print(token)
                 return jsonify({'message': 'Logged in successfully', 'token': token}), 200
             else:
                 failed_login_attempt(user)
