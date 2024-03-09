@@ -24,8 +24,10 @@ def update_date_time(view:View,time_played:datetime):
     # update the view.dtMovieTime
     db.session.commit()
 
-def check_if_account_is_blocked(user) : 
-    if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(timezone.utc) :
+def check_if_account_is_blocked(user) :
+    blocked_date = user.dtAccountBlockedTill.replace(tzinfo=timezone.utc)
+    
+    if user.isAccountBlocked and user.dtAccountBlockedTill and blocked_date > datetime.now(timezone.utc) :
                    return True
     else :
         return False
@@ -60,6 +62,7 @@ def handle_access_token(user_info,user,data):
     return token
 def failed_login_attempt(user) : 
     user.dtFailedLoginAttempts += 1
+    print(user.dtFailedLoginAttempts)
     if user.dtFailedLoginAttempts >= 3:
         user.isAccountBlocked = True
         user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)

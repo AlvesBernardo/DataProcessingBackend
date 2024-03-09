@@ -29,6 +29,7 @@ def login():
         else : 
             return jsonify({'message': 'Provided pasword or email is invalid'}), 401
         if user:
+            
             if check_if_account_is_blocked(user) :
                 return jsonify({"message": "Account blocked for 1 hour due to failed login attempts"}), 403
             if check_password_hash(user.dtPassword, data['dtPassword']):
@@ -40,7 +41,7 @@ def login():
                 db.session.commit()
                 return jsonify({'message': 'Logged in successfully', 'token': token}), 200
             else:
-                failed_login_attempt(user)
+                return failed_login_attempt(user)
         else:
            return jsonify({'message': 'This email is not registered on the website'}), 401
     except SQLAlchemyError as e:
