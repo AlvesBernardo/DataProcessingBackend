@@ -35,7 +35,7 @@ def login():
             if check_password_hash(user.dtPassword, data['dtPassword']):
                 user.dtFailedLoginAttempts = 0
                 user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
-                # user_info['roles'] = "user" if user_info['isAdmin'] == 0 else "admin"
+                user_info['dtIsAdmin'] = "user" if user_info['isAdmin'] == 0 else "admin"
                 token = handle_access_token(user_info,user,data)
                 # Other user info and token generation logic...
                 db.session.commit()

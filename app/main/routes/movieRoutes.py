@@ -24,7 +24,7 @@ def convert_to_csv(header:list,data:list) :
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_classifications(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
@@ -62,7 +62,7 @@ def manage_classifications(id=None):
 @movie_routes.route('/genres', methods=['GET', 'POST'])
 @movie_routes.route('/genres/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_genres(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
@@ -114,7 +114,7 @@ def manage_genres(id=None):
 @movie_routes.route('/movies/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard()
 def manage_movies(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
@@ -181,7 +181,7 @@ def manage_movies(id=None):
 @movie_routes.route('/qualities/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard()
 def manage_qualities(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
@@ -245,7 +245,7 @@ def manage_qualities(id=None):
 @movie_routes.route('/subtitles/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard()
 def manage_subtitles(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
     if request.method == 'GET':
         if id:
