@@ -12,6 +12,7 @@ class TestQualityClass(unittest.TestCase):
         self.assertEqual(quality.get_description(), "HD")
         self.assertEqual(quality.get_price(), 10.99)
 
+
     def test_setters(self):
         quality = Quality("UHD", 13.99)
         quality.set_description("SD")
