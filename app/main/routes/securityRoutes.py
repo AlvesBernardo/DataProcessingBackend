@@ -71,6 +71,8 @@ def login():
         user = None  # Initialize user to None
         if check(data['dtEmail']) and validate_password(data['dtPassword']):
             user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
+        else : 
+            return jsonify({'message': 'Provided pasword or email is invalid'}), 401
         if user:
             if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(timezone.utc):
                 return jsonify({"message": "Account blocked for 1 hour due to failed login attempts"}), 403
