@@ -267,11 +267,11 @@ def manage_subtitles(id=None):
     elif request.method == 'POST':
         data = request.get_json()
 
-        new_subscription_data = (data['fiMovie'], data['fiLanguage'])
+        new_subtitle_data = (data['fiMovie'], data['fiLanguage'])
         end_message = call_stored_procedure_post("""InsertSubtitle
                                                                     @fiMovie = ?,
                                                                     @fiLanguage = ?
-                                                                """, new_subscription_data)
+                                                                """, new_subtitle_data)
         if not end_message:
             return jsonify({'message': 'new Subtitle added'}),201
         else:
