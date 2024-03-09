@@ -21,12 +21,16 @@ def check_if_account_is_blocked(user) :
                 {"message": "Your account has been blocked for 1 hour due to too many failed login attempts"}), 403
     else :
         return None
+    
+
 def generate_new_token(user_info,user) :
     refresh_token = generate_refresh_token(payload=user_info)
     user.dtRefreshToken = refresh_token
     user.dtRefreshToken_valid_until = datetime.now(timezone.utc) + timedelta(days=1)
     token = generate_jwt_token(payload=user_info)
     return (refresh_token, token)
+
+
 def handle_access_token(user_info,user,data):
     refreshToken = user.dtRefreshToken
     if refreshToken:
@@ -52,9 +56,11 @@ def failed_login_attempt(user) :
         user.isAccountBlocked = True
         user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
 
-    db.session.commit()
+    db.session.commit() 
 
     return jsonify({'message': 'Incorrect email or password'}), 401
+
+
 @security.route('/login', methods=['POST'])
 def login():
     try:

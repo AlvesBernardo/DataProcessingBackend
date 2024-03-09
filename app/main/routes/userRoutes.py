@@ -16,6 +16,8 @@ from app.extensions import call_stored_procedure_post, call_stored_procedure_get
 user_route = Blueprint('user', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
+
+
 def get_multiple_objects(query_list,attribute_list:list) :
     output = []
     for object in query_list :

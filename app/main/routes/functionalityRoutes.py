@@ -18,6 +18,8 @@ def calculate_final_time(time_played:datetime):
     minutes, seconds = divmod(remainder, 60)
     time_object = time(int(hours), int(minutes), int(seconds))
     return time_object
+
+
 def update_date_time(view:View,time_played:datetime):
     reference_date = datetime.date.today()
     datetime_obj = datetime.datetime.combine(reference_date, view.dtMovieTime)
