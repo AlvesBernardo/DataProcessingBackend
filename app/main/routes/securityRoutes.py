@@ -151,7 +151,11 @@ def register():
 
 @security.route('/forgot-password', methods=['POST'])
 def forgot_password():
-    email = request.form.get('dtEmail')
+    data = request.get_json()
+    if not data or not 'dtEmail' in data:
+        return jsonify({'message': 'Bad Request'}), 400
+    
+    email = data['dtEmail']
     if not email:
         return jsonify({'message': 'Email is required'}), 400
     elif check(email):
@@ -161,7 +165,7 @@ def forgot_password():
 
         token = s.dumps(email, salt='email-confirm')
 
-        link = url_for('reset_password', token=token, _external=True, _scheme='https')
+        link = url_for('security.reset_password', token=token, _external=True, _scheme='https')
         subject = 'Password Reset Requested'
         body = 'Please follow this link to reset your password: {}'.format(link)
 
