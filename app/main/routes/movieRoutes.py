@@ -11,7 +11,7 @@ from app.services.auth_guard import auth_guard
 import io
 import csv
 from dateutil.parser import parse
-
+from .routeFunctions import *
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}

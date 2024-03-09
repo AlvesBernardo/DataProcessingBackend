@@ -10,23 +10,10 @@ from app.models.timesPlayed_model import TimesPlayed
 import datetime
 from datetime import time
 from app.services.auth_guard import auth_guard
-
+from .routeFunctions import *
 functionality_routes = Blueprint('functionality_routes', __name__)
 s = URLSafeTimedSerializer('secret')
-def calculate_final_time(time_played:datetime):
-    hours, remainder = divmod(time_played.total_seconds(), 3600)
-    minutes, seconds = divmod(remainder, 60)
-    time_object = time(int(hours), int(minutes), int(seconds))
-    return time_object
 
-
-def update_date_time(view:View,time_played:datetime):
-    reference_date = datetime.date.today()
-    datetime_obj = datetime.datetime.combine(reference_date, view.dtMovieTime)
-    updated_datetime = datetime_obj + time_played
-    view.dtMovieTime = updated_datetime.time()
-    # update the view.dtMovieTime
-    db.session.commit()
 play_time_counter = {}
 
 

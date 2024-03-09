@@ -12,7 +12,6 @@ password = os.getenv("DATABASE_PASSWORD")
 database_url = os.getenv("DATABASE_URL")
 
 connection_url = database_url
-
 engine = create_engine(connection_url, echo=True)
 
 metadata = MetaData()

@@ -12,25 +12,10 @@ from app.services.auth_guard import check_jwt_token
 import datetime
 from app.services.auth_guard import auth_guard
 from app.extensions import call_stored_procedure_post, call_stored_procedure_get
-
+from .routeFunctions import *
 user_route = Blueprint('user', __name__)
 s = URLSafeTimedSerializer('secret')
-play_count = {}
-
-
-def get_multiple_objects(query_list,attribute_list:list) :
-    output = []
-    for object in query_list :
-        object_data = {}
-        try :
-            for attribute in attribute_list :
-                object_data[attribute] = getattr(object,attribute)
-            output.append(object_data)
-        except Exception as e :
-            return jsonify({'message': f'Error: {e}'}), 500
-    return jsonify({'results':output}),200
-
-        
+play_count = {}    
 @user_route.route('/users', methods=['GET', 'POST'])
 @user_route.route('/users/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard('admin')
