@@ -28,7 +28,7 @@ def play_movie(profile_id, movie_id):
     if profile_id in play_time_counter:
         return jsonify({"message": "movie cannot be played at the moment"}),423
     else:
-        play_time_counter[profile_id] = {"movie": movie_id, "start_counter": datetime.datetime.now()}
+        play_time_counter[profile_id] = {"movie": movie_id, "start_counter": datetime.now()}
         return jsonify({"message": "movie played successfully"}),200
 
 
