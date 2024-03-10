@@ -16,7 +16,7 @@ s = URLSafeTimedSerializer('secret')
 play_time_counter = {}
 
 
-@functionality_routes.route('/play_movie/<int:profile_id>/<int:movie_id>')
+@functionality_routes.route('/play_movie/<int:profile_id>/<int:movie_id>',methods=['POST'])
 @auth_guard()
 def play_movie(profile_id, movie_id):
     profile_id = str(profile_id)
