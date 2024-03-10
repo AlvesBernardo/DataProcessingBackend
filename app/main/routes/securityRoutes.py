@@ -20,7 +20,7 @@ s = URLSafeTimedSerializer('secret')
 def login():
     try:
         data = request.get_json()
-        if not data or 'dtEmail' not in data or 'dtPassword' not in data:
+        if not verify_data(data,['dtEmail','dtPassword']):
             return jsonify({'message': 'Bad Request'}), 400
 
         user = None  # Initialize user to None
@@ -35,9 +35,9 @@ def login():
             if check_password_hash(user.dtPassword, data['dtPassword']):
                 user.dtFailedLoginAttempts = 0
                 user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
-                user_info['dtIsAdmin'] = "user" if user.IsAdmin == 0 else "admin"
+
+                user_info['dtIsAdmin'] = "user" if user.dtIsAdmin == 0 else "admin"
                 token = handle_access_token(user_info,user,data)
-                # Other user info and token generation logic...
                 db.session.commit()
                 print(token)
                 return jsonify({'message': 'Logged in successfully', 'token': token}), 200
@@ -46,16 +46,15 @@ def login():
         else:
            return jsonify({'message': 'This email is not registered on the website'}), 401
     except SQLAlchemyError as e:
-        print(e)  # Or use logging
+        print(e) 
         return jsonify({'message': 'Internal Server Error'}), 500
 
     
 @security.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-
-    if not data or not 'dtEmail' in data or not 'dtPassword' in data or not 'dtIsAdmin' in data or not 'fiSubscription' in data or not 'fiLanguage' in data or not 'dtRefreshToken' in data:
-        return jsonify({'message': 'Bad Request'}),400
+    if not verify_data(data,['dtEmail','dtPassword','dtIsAdmin','fiSubscription','fiLanguage','dtRefreshToken']):
+        return jsonify({'message': 'Bad Request'}), 400
     elif check(data['dtEmail']) and validate_password(data['dtPassword']):
         user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
         if user:
@@ -108,9 +107,8 @@ def register():
 @security.route('/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.get_json()
-    if not data or not 'dtEmail' in data:
+    if not verify_data(data,['dtEmail']):
         return jsonify({'message': 'Bad Request'}), 400
-    
     email = data['dtEmail']
     if not email:
         return jsonify({'message': 'Email is required'}), 400

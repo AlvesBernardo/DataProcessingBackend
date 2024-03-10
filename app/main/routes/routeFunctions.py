@@ -25,6 +25,8 @@ def update_date_time(view:View,time_played:datetime):
     db.session.commit()
 
 def check_if_account_is_blocked(user) :
+    if not user.isAccountBlocked :
+        return False
     blocked_date = user.dtAccountBlockedTill.replace(tzinfo=timezone.utc)
     
     if user.isAccountBlocked and user.dtAccountBlockedTill and blocked_date > datetime.now(timezone.utc) :
@@ -81,4 +83,17 @@ def get_multiple_objects(query_list,attribute_list:list) :
         except Exception as e :
             return jsonify({'message': f'Error: {e}'}), 500
     return jsonify({'results':output}),200
+def verify_data(data :dict, required_fields: list) -> bool : 
+    index = 0
+    for key,value in data.items():
+        if key != required_fields[index] :
+            return False
+        index += 1  
+    return True
+def convert_to_csv(header:list,data:list) :
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(header)
+    cw.writerows(data)
+    return si.getvalue()
 
