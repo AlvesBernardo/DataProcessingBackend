@@ -70,7 +70,7 @@ def manage_users(id=None):
 
 @user_route.route('/subscriptions', methods=['GET', 'POST'])
 @user_route.route('/subscriptions/<id>', methods=['GET', 'POST', 'DELETE'])
-@auth_guard
+@auth_guard()
 def manage_subscriptions(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id'}), 400
