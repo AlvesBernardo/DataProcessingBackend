@@ -18,14 +18,13 @@ play_count = {}
 
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
-@auth_guard("admin")
 def manage_classifications(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
     
     if request.method == 'GET':
         classification_data = [{'id': 1, 'description': 'Classification 1'},
-                                {'id': 2, 'description': 'Classification 2'}]
+                                   {'id': 2, 'description': 'Classification 2'}]
 
         if 'text/csv' in request.headers.get('Accept', ''):
             # Convert response data to CSV
@@ -52,9 +51,9 @@ def manage_classifications(id=None):
         return jsonify({'message': 'Method not allowed'}), 405
 
 
+@auth_guard('admin')
 @movie_routes.route('/genres', methods=['GET', 'POST'])
 @movie_routes.route('/genres/<id>', methods=['GET', 'PUT', 'DELETE'])
-@auth_guard("admin")
 def manage_genres(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
@@ -106,7 +105,7 @@ def manage_genres(id=None):
 
 @movie_routes.route('/movies', methods=['GET', 'POST'])
 @movie_routes.route('/movies/<id>', methods=['GET', 'PUT', 'DELETE'])
-@auth_guard("admin")
+@auth_guard()
 def manage_movies(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
@@ -165,8 +164,8 @@ def manage_movies(id=None):
         movie = Movie.query.get(id)
         if not movie:
             return jsonify({'message': 'No movie found!'}), 404
-
-        movie.dtTitle = data.get('dtTitle', movie.dtTitle)
+        movie.dtTitle = data.get('dtTitle', movie.dtTitle)       
+        return jsonify({'message': 'Movie updated'}),200
         
     elif request.method == 'DELETE':
         end_message = call_stored_procedure_post("DeleteMovieAndRelatedContent @MovieID = ? ", (id,))
@@ -178,7 +177,7 @@ def manage_movies(id=None):
 
 @movie_routes.route('/qualities', methods=['GET', 'POST'])
 @movie_routes.route('/qualities/<id>', methods=['GET', 'PUT', 'DELETE'])
-@auth_guard("admin")
+@auth_guard()
 def manage_qualities(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
@@ -193,6 +192,7 @@ def manage_qualities(id=None):
                 'dtPrice': quality.dtPrice
             }
             return jsonify(quality_data),200
+        
         else:
             qualities = Quality.query.all()
             output = []
@@ -204,6 +204,7 @@ def manage_qualities(id=None):
                 }
                 output.append(quality_data)
             return jsonify({'qualities': output}),200
+    
     elif request.method == 'POST':
         data = request.get_json()
         if not verify_data(data, ['dtDescription', 'dtPrice']):
@@ -217,36 +218,32 @@ def manage_qualities(id=None):
         if not end_message:
             db.session.commit()
             return jsonify({'message': 'new quality added'}),201
+        
         else:
             return jsonify({'message': 'quality could not be added', 'error_message': end_message}),406
+    
     elif request.method == 'PUT':
         data = request.get_json()
         quality = Quality.query.get(id)
-
         if not quality:
             return jsonify({'message': 'No Quality found!'}), 404
-
         quality.dtDescription = data.get('dtDescription', quality.dtDescription)
         quality.dtPrice = data.get('dtPrice', quality.dtPrice)
-
         db.session.commit()
-
         return jsonify({'message': 'Quality updated'}),200
 
     elif request.method == 'DELETE':
         quality = Quality.query.get(id)
         if not quality:
             return jsonify({'message': 'No Quality found!'}), 404
-
         db.session.delete(quality)
         db.session.commit()
-
         return jsonify({'message': 'Quality has been deleted'}),200
 
 
 @movie_routes.route('/subtitles', methods=['GET', 'POST'])
 @movie_routes.route('/subtitles/<id>', methods=['GET', 'PUT', 'DELETE'])
-@auth_guard("admin")
+@auth_guard()
 def manage_subtitles(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
