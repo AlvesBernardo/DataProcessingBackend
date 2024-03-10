@@ -44,7 +44,8 @@ def manage_users(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-
+        if not verify_data(data,['dtEmail','dtPassword','fiSubscription','fiLanguage']):
+            return jsonify({'message': 'Bad Request'}), 400
         new_classification_data = (data['dtEmail'], data['dtPassword'], data['fiSubscription'], data['fiLanguage'])
         end_message = call_stored_procedure_post("""InsertAccount
                                                                 @dtEmail = ? ,
@@ -97,7 +98,8 @@ def manage_subscriptions(id=None):
         return jsonify(response)
     elif request.method == 'POST':
         data = request.get_json()
-        data = request.get_json()
+        if not verify_data(data,['Payment','DateOfSignUp','QualityType']):
+            return jsonify({'message': 'Bad Request'}), 400
         new_profile_data = (data['Payment'], data['DateOfSignUp'], data['QualityType'])
         end_message = call_stored_procedure_post("""InsertSubscription
                                                                 @Payment = ?,
@@ -142,6 +144,8 @@ def manage_languages(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
+        if not verify_data(data,['dtDescription']):
+            return jsonify({'message': 'Bad Request'}), 400
         new_subscription_data = (data['dtDescription'])
         end_message = call_stored_procedure_post("""InsertLanguage
                                                                     @dtDescription = ?
@@ -187,7 +191,9 @@ def manage_profiles(id=None):
             return get_multiple_objects(profiles,['idProfile','dtName','dtMinor','dtProfileImage','fiAccount','fiGenre'])
     elif request.method == 'POST':
         data = request.get_json()
-        new_language_data = (
+        if not verify_data(data,['Name','IsMinor','ProfileImage','IsAccountDisabled','AccountID','Genre']):
+            return jsonify({'message': 'Bad Request'}), 400
+        new_profiles_data = (
             data['Name'], data['IsMinor'], data['ProfileImage'], data['IsAccountDisabled'], data['AccountID'],
             data['Genre']
         )
@@ -198,7 +204,7 @@ def manage_profiles(id=None):
                                                                 @IsAccountDisabled = ? ,
                                                                 @AccountID = ? , 
                                                                 @Genre = ? 
-                                                                """, new_language_data)
+                                                                """, new_profiles_data)
         if not end_message:
             return jsonify({'message': 'new profile added'}), 201
         else:
@@ -238,6 +244,8 @@ def manage_views(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
+        if not verify_data(data,['SubtitleID','MovieID','ProfileID','MovieTime']):
+            return jsonify({'message': 'Bad Request'}), 400
         new_profile_data = (data['SubtitleID'], data['MovieID'], data['ProfileID'], data["MovieTime"])
         end_message = call_stored_procedure_post("""InsertView
                                                                 @SubtitleID = ?,
@@ -288,6 +296,8 @@ def handle_watchlist(id=None):
             return jsonify([e.serialize() for e in watchlist])
     elif request.method == 'POST':
         data = request.get_json()
+        if not verify_data(data,['fiMovie','fiProfile']):
+            return jsonify({'message': 'Bad Request'}), 400
         new_watchlist_data = (data['fiMovie'], data['fiProfile'])
         end_message = call_stored_procedure_post("""InsertWatchList
                                                                 @MovieID = ? ,

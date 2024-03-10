@@ -137,6 +137,9 @@ def manage_movies(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
+        if not verify_data(data, ['dtTitle', 'dtYear', 'dtAmountOfEP', 'dtAmountOfSeasons', 'dtLength', 'dtMinAge',
+                                  'fiType', 'fiLanguage', 'fiClassification', 'fiGenre']):
+            return jsonify({'message': 'Bad Request'}), 400
         new_movie_data = (data['dtTitle'], parse(data['dtYear']), data['dtAmountOfEP'], data['dtAmountOfSeasons'],
                              parse(data['dtLength']),
                              data['dtMinAge'], data['fiType'], data['fiLanguage'], data['fiClassification'],
@@ -203,6 +206,8 @@ def manage_qualities(id=None):
             return jsonify({'qualities': output}),200
     elif request.method == 'POST':
         data = request.get_json()
+        if not verify_data(data, ['dtDescription', 'dtPrice']):
+            return jsonify({'message': 'Bad Request'}), 400
         new_profile_data = (data['dtDescription'], data['dtPrice'])
         end_message = call_stored_procedure_post("""InsertQuality
                                                                 @dtDescription = ?,
@@ -264,7 +269,8 @@ def manage_subtitles(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-
+        if not verify_data(data, ['fiMovie', 'fiLanguage']):
+            return jsonify({'message': 'Bad Request'}), 400
         new_subtitle_data = (data['fiMovie'], data['fiLanguage'])
         end_message = call_stored_procedure_post("""InsertSubtitle
                                                                     @fiMovie = ?,
