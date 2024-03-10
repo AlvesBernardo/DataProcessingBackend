@@ -290,7 +290,9 @@ def handle_watchlist(id=None):
             watchlist = WatchList.query.get(id)
             if watchlist is None:
                 return jsonify(f'Watchlist with Id {id} does not exist'), 404
-            return jsonify(watchlist.serialize())
+            watchlist_data = {"idWatchList": watchlist.idWatchList, "fiMovie": watchlist.fiMovie,
+                            "fiProfile": watchlist.fiProfile}
+            return jsonify(watchlist_data),200
         else:
             watchlist = WatchList.query.all()
             return jsonify([e.serialize() for e in watchlist])
