@@ -213,6 +213,7 @@ def manage_qualities(id=None):
                                                                 @dtPrice = ?
                                                                 """, new_profile_data)
         if not end_message:
+            db.session.commit()
             return jsonify({'message': 'new quality added'}),201
         else:
             return jsonify({'message': 'quality could not be added', 'error_message': end_message}),406
