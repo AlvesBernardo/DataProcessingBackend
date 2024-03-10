@@ -165,9 +165,12 @@ def manage_movies(id=None):
         if not movie:
             return jsonify({'message': 'No movie found!'}), 404
         movie.dtTitle = data.get('dtTitle', movie.dtTitle)       
-        return jsonify({'message': 'Movie updated'}),200
+        return jsonify({'message': 'Movie updated'}),406
         
     elif request.method == 'DELETE':
+        wanted_movie = Movie.query.get(id)
+        if not wanted_movie:
+            return jsonify({'message': 'No movie found!'}), 404
         end_message = call_stored_procedure_post("DeleteMovieAndRelatedContent @MovieID = ? ", (id,))
         if not end_message:
             return jsonify({'message': 'movie deleted'}),200
