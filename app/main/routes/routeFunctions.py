@@ -89,7 +89,11 @@ def verify_data(data :dict, required_fields: list) -> bool :
         if key != required_fields[index] :
             return False
         index += 1  
-     
-     
     return True
+def convert_to_csv(header:list,data:list) :
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(header)
+    cw.writerows(data)
+    return si.getvalue()
 

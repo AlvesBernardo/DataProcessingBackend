@@ -20,7 +20,7 @@ play_count = {}
 @user_route.route('/users/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard('admin')
 def manage_users(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
@@ -71,7 +71,7 @@ def manage_users(id=None):
 @user_route.route('/subscriptions/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard
 def manage_subscriptions(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         current_user_id = check_jwt_token()
@@ -122,7 +122,7 @@ def manage_subscriptions(id=None):
 @user_route.route('/languages/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard('admin')
 def manage_languages(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
@@ -166,7 +166,7 @@ def manage_languages(id=None):
 @user_route.route('/profiles/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def manage_profiles(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
@@ -216,7 +216,7 @@ def manage_profiles(id=None):
 @user_route.route('/views/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def manage_views(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
@@ -275,7 +275,7 @@ def manage_views(id=None):
 @user_route.route('/watchlist/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def handle_watchlist(id=None):
-    if id and not isinstance(id, int):
+    if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:

@@ -15,12 +15,7 @@ from .routeFunctions import *
 movie_routes = Blueprint('movies', __name__)
 s = URLSafeTimedSerializer('secret')
 play_count = {}
-def convert_to_csv(header:list,data:list) :
-    si = io.StringIO()
-    cw = csv.writer(si)
-    cw.writerow(header)
-    cw.writerows(data)
-    return si.getvalue()
+
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_classifications(id=None):
