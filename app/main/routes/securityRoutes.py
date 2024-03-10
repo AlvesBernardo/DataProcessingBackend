@@ -53,7 +53,7 @@ def login():
 @security.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    if not verify_data(data,['dtEmail','dtPassword','dtIsAdmin','fiSubscription','fiLanguage','dtRefreshToken']):
+    if not verify_data(data,['dtEmail','dtPassword','isAccountBlocked','dtIsAdmin','fiSubscription','fiLanguage','dtRefreshToken']):
         return jsonify({'message': 'Bad Request'}), 400
     elif check(data['dtEmail']) and validate_password(data['dtPassword']):
         user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
