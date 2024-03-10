@@ -25,6 +25,8 @@ def update_date_time(view:View,time_played:datetime):
     db.session.commit()
 
 def check_if_account_is_blocked(user) :
+    if not user.isAccountBlocked :
+        return False
     blocked_date = user.dtAccountBlockedTill.replace(tzinfo=timezone.utc)
     
     if user.isAccountBlocked and user.dtAccountBlockedTill and blocked_date > datetime.now(timezone.utc) :

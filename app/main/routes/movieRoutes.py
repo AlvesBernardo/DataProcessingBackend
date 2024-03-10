@@ -142,7 +142,7 @@ def manage_movies(id=None):
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_language_data = (data['dtTitle'], parse(data['dtYear']), data['dtAmountOfEP'], data['dtAmountOfSeasons'],
+        new_movie_data = (data['dtTitle'], parse(data['dtYear']), data['dtAmountOfEP'], data['dtAmountOfSeasons'],
                              parse(data['dtLength']),
                              data['dtMinAge'], data['fiType'], data['fiLanguage'], data['fiClassification'],
                              data['fiGenre'],)
@@ -157,8 +157,9 @@ def manage_movies(id=None):
                                                                     @fiLanguage = ?,
                                                                     @fiClassification = ?,
                                                                     @fiGenre = ? 
-                                                                    """, new_language_data)
+                                                                    """, new_movie_data)
         if not end_message:
+            db.session.commit()
             return jsonify({'message': 'new movie added'}),201
         else:
             return jsonify({'message': 'movie could not be added', 'error_message': end_message}),406
@@ -212,6 +213,7 @@ def manage_qualities(id=None):
                                                                 @dtDescription = ?,
                                                                 @dtPrice = ?
                                                                 """, new_profile_data)
+        db.session.commit()
         if not end_message:
             return jsonify({'message': 'new quality added'}),201
         else:
