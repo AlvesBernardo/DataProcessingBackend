@@ -11,8 +11,7 @@ username = os.getenv("DATABASE_USERNAME")
 password = os.getenv("DATABASE_PASSWORD")
 database_url = os.getenv("DATABASE_URL")
 
-connection_url = f"mssql+pyodbc://{username}:{password}@{server_name}/{database_name}?driver=ODBC+Driver+17+for+SQL+Server"
-
+connection_url = database_url
 engine = create_engine(connection_url, echo=True)
 
 metadata = MetaData()
