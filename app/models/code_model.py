@@ -8,3 +8,6 @@ class Code(db.Model):
     dtCode = db.Column(db.Integer)
     fiEmail = db.Column(db.Integer, db.ForeignKey("tblAccount.dtEmail"))
     account = relationship("Account")
+
+    def __repr__(self):
+        return '<Code %r>' % self.idCode

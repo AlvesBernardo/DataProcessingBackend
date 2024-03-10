@@ -58,7 +58,7 @@ def call_stored_procedure_post(procedure_name: str, param_value_list: tuple):
         return cursor.messages
     except Exception as e:
         connection.rollback()
-        print(f"Eroare An error occurred: {e}")
+        
         return None
 
     finally:

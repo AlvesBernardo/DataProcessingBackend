@@ -12,9 +12,9 @@ class Account(db.Model):
     subscription = relationship("Subcription")
     fiLanguage = db.Column(db.Integer, db.ForeignKey("tblLanguage.idLanguage"))
     language = relationship("Language")
-    dtFailedLoginAttemps = db.Column(db.Integer, nullable=False, default=0)
-    dtAccountBlockedTill = db.Column(db.Date, nullable=True)
+    dtFailedLoginAttempts = db.Column(db.Integer, nullable=False, default=0)
+    dtAccountBlockedTill = db.Column(db.DateTime, nullable=True)
     dtRefreshToken = db.Column(db.String(512), nullable=False)
 
-    def repr(self):
+    def __repr__(self):
         return '<Account %r>' % self.idAccount

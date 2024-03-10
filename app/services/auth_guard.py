@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from .jwt_handler import decode_jwt_token
+from datetime import datetime, timedelta
 
 
 def check_jwt_token(token=None):
@@ -10,10 +11,9 @@ def check_jwt_token(token=None):
         token = token.replace('Bearer ', '').strip()
     try:
         decoded_token = decode_jwt_token(token)
-        print(f"Decoded Token: {decoded_token}")
         return decoded_token
     except Exception as e:
-        raise Exception(f'Invalid access token: {e}')
+        raise Exception(f'Invalid authGuard access token: {e}')
 
 
 def auth_guard(role=None):

@@ -14,4 +14,4 @@ class Profile(db.Model):
     genre = relationship("Genre")
 
     def __repr__(self):
-        return '<View %r>' % self.idProfile
+        return '<Profile %r>' % self.idProfile

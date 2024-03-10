@@ -11,10 +11,10 @@ from app.extensions import call_stored_procedure_post
 from app.utils.passwordValidation import validate_password
 from app.utils.emailValidation import check
 from sqlalchemy.exc import SQLAlchemyError
+from .routeFunctions import *
 
 security = Blueprint('security', __name__)
 s = URLSafeTimedSerializer('secret')
-
 
 @security.route('/login', methods=['POST'])
 def login():
@@ -26,49 +26,48 @@ def login():
         user = None  # Initialize user to None
         if check(data['dtEmail']) and validate_password(data['dtPassword']):
             user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
-
+        else : 
+            return jsonify({'message': 'Provided pasword or email is invalid'}), 401
         if user:
-            if user.isAccountBlocked and user.dtAccountBlockedTill and user.dtAccountBlockedTill > datetime.now(timezone.utc):
+            
+            if check_if_account_is_blocked(user) :
                 return jsonify({"message": "Account blocked for 1 hour due to failed login attempts"}), 403
-
             if check_password_hash(user.dtPassword, data['dtPassword']):
                 user.dtFailedLoginAttempts = 0
+                user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
+                user_info['dtIsAdmin'] = "user" if user_info['isAdmin'] == 0 else "admin"
+                token = handle_access_token(user_info,user,data)
                 # Other user info and token generation logic...
                 db.session.commit()
+                print(token)
                 return jsonify({'message': 'Logged in successfully', 'token': token}), 200
             else:
-                user.dtFailedLoginAttempts += 1
-                if user.dtFailedLoginAttempts >= 3:
-                    user.isAccountBlocked = True
-                    user.dtAccountBlockedTill = datetime.now(timezone.utc) + timedelta(minutes=60)
-                db.session.commit()
-                return jsonify({'message': 'Incorrect email or password'}), 401
+                return failed_login_attempt(user)
         else:
-            return jsonify({'message': 'Incorrect email or password'}), 401
+           return jsonify({'message': 'This email is not registered on the website'}), 401
     except SQLAlchemyError as e:
         print(e)  # Or use logging
         return jsonify({'message': 'Internal Server Error'}), 500
 
+    
 @security.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
 
-    if not data or not 'dtEmail' in data or not 'dtPassword' in data or not 'isAccountBlocked' in data or not 'isAdmin' or not 'fiSubscription' in data or not 'fiLanguage' in data:
-        return jsonify({'message': 'Bad Request'}), 400
+    if not data or not 'dtEmail' in data or not 'dtPassword' in data or not 'dtIsAdmin' in data or not 'fiSubscription' in data or not 'fiLanguage' in data or not 'dtRefreshToken' in data:
+        return jsonify({'message': 'Bad Request'}),400
     elif check(data['dtEmail']) and validate_password(data['dtPassword']):
         user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
-
         if user:
-            return jsonify({"message": "User Already Exists. Please Login"}), 409
+            return jsonify({"message": "User Already Exists. Please Login"}),409
         else:
             code = "".join([str(random.randint(0, 9)) for _ in range(4)])
             dtEmail_with_code = data['dtEmail'] + code
-
             new_user = Account(
                 dtEmail=data['dtEmail'],
                 dtPassword=generate_password_hash(data['dtPassword']),
                 isAccountBlocked=bool(data['isAccountBlocked']),
-                dtIsAdmin=bool(data['isAdmin']),
+                dtIsAdmin=bool(data['dtIsAdmin']),
                 fiSubscription=1,
                 fiLanguage=1,
             )
@@ -82,11 +81,13 @@ def register():
 
             code_data = (code, dtEmail_with_code)
 
-            new_user.append(code_data)
+            # new_user.append(code_data)
 
             call_stored_procedure_post("""InsertCode
                                                         @dtEmail = ?,
                                                         @dtPassword = ?,
+                                                        @isAccountBlocked = ?,
+                                                        @dtIsAdmin = ?,
                                                         @fiSubscription = ?,
                                                         @fiLanguage = ?,
                                                         @dtRefreshToken = ?""", new_user)
@@ -106,7 +107,11 @@ def register():
 
 @security.route('/forgot-password', methods=['POST'])
 def forgot_password():
-    email = request.form.get('dtEmail')
+    data = request.get_json()
+    if not data or not 'dtEmail' in data:
+        return jsonify({'message': 'Bad Request'}), 400
+    
+    email = data['dtEmail']
     if not email:
         return jsonify({'message': 'Email is required'}), 400
     elif check(email):
@@ -116,7 +121,7 @@ def forgot_password():
 
         token = s.dumps(email, salt='email-confirm')
 
-        link = url_for('reset_password', token=token, _external=True, _scheme='https')
+        link = url_for('security.reset_password', token=token, _external=True, _scheme='https')
         subject = 'Password Reset Requested'
         body = 'Please follow this link to reset your password: {}'.format(link)
 

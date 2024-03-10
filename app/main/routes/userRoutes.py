@@ -1,6 +1,7 @@
 from app.extensions import db
 from flask import Blueprint, request, jsonify
 from itsdangerous import URLSafeTimedSerializer
+from app.models.classification_model import Classification
 from app.models.account_model import Account
 from app.models.language_model import Language
 from app.models.profile_model import Profile
@@ -11,27 +12,16 @@ from app.services.auth_guard import check_jwt_token
 import datetime
 from app.services.auth_guard import auth_guard
 from app.extensions import call_stored_procedure_post, call_stored_procedure_get
-
+from .routeFunctions import *
 user_route = Blueprint('user', __name__)
 s = URLSafeTimedSerializer('secret')
-play_count = {}
-def get_multiple_objects(query_list,attribute_list:list) :
-    output = []
-    for object in query_list :
-        object_data = {}
-        try :
-            for attribute in attribute_list :
-                object_data[attribute] = getattr(object,attribute)
-            output.append(object_data)
-        except Exception as e :
-            return jsonify({'message': f'Error: {e}'}), 500
-    return jsonify({'results':output})
-
-        
+play_count = {}    
 @user_route.route('/users', methods=['GET', 'POST'])
 @user_route.route('/users/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard('admin')
 def manage_users(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             user = Account.query.get(id)
@@ -65,22 +55,24 @@ def manage_users(id=None):
                                                                 @dtRefreshtoken = ? , """,
                                                                 new_classification_data)
         if not end_message:
-            return jsonify({'message': 'new account added'})
+            return jsonify({'message': 'new account added'}),201
         else:
-            return jsonify({'message': 'account could not be added', 'error_message': end_message})
+            return jsonify({'message': 'account could not be added', 'error_message': end_message}),406
     elif request.method == 'DELETE':
         user = Account.query.get(id)
         error_message = call_stored_procedure_post("DeleteAccountAndRelatedContent @AccountID = ? ", (id,))
         if not error_message:
-            return jsonify({'message': 'account deleted'})
+            return jsonify({'message': 'account deleted'}),200
         else:
-            return jsonify({'message': 'account could not be deleted', 'error_message': error_message})
+            return jsonify({'message': 'account could not be deleted', 'error_message': error_message}),406
 
 
 @user_route.route('/subscriptions', methods=['GET', 'POST'])
 @user_route.route('/subscriptions/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard
 def manage_subscriptions(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         current_user_id = check_jwt_token()
         account_details = call_stored_procedure_get("""
@@ -113,10 +105,9 @@ def manage_subscriptions(id=None):
                                                                 @QualityType = ? 
                                                                 """, new_profile_data)
         if not end_message:
-            return jsonify({'message': 'new quality added'})
+            return jsonify({'message': 'new Subscription added'}),201
         else:
-            return jsonify({'message': 'quality could not be added', 'error_message': end_message})
-        return jsonify({'message': 'new subscription added'})
+            return jsonify({'message': 'Subscription could not be added', 'error_message': end_message}),406
     elif request.method == 'DELETE':
         subscription = Subcription.query.get(id)
         if not subscription:
@@ -124,13 +115,15 @@ def manage_subscriptions(id=None):
         db.session.delete(subscription)
         db.session.commit()
 
-        return jsonify({'message': 'subscription has been deleted'})
+        return jsonify({'message': 'subscription has been deleted'}),200
 
 
 @user_route.route('/languages', methods=['GET', 'POST'])
 @user_route.route('/languages/<id>', methods=['GET', 'POST', 'DELETE'])
 @auth_guard('admin')
 def manage_languages(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             language = Language.query.get(id)
@@ -141,7 +134,7 @@ def manage_languages(id=None):
                 'dtDescription': language.dtDescription
             }
 
-            return jsonify(language_data)
+            return jsonify(language_data),200
         else:
             languages = Language.query.all()
             return get_multiple_objects(languages,['idLanguage','dtDescription'])
@@ -155,9 +148,9 @@ def manage_languages(id=None):
                                                                 """,
                                                  new_subscription_data)
         if not end_message:
-            return jsonify({'message': 'new Language added'})
+            return jsonify({'message': 'new Language added'}),201
         else:
-            return jsonify({'message': 'Language could not be added', 'error_message': end_message})
+            return jsonify({'message': 'Language could not be added', 'error_message': end_message}),406
     elif request.method == 'DELETE':
         language = Language.query.get(id)
         if not language:
@@ -166,13 +159,15 @@ def manage_languages(id=None):
         db.session.delete(language)
         db.session.commit()
 
-        return jsonify({'message': 'language has been deleted'})
+        return jsonify({'message': 'language has been deleted'}),200
 
 
 @user_route.route('/profiles', methods=['GET', 'POST'])
 @user_route.route('/profiles/<id>', methods=['GET', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def manage_profiles(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             profile = Profile.query.get(id)
@@ -205,9 +200,9 @@ def manage_profiles(id=None):
                                                                 @Genre = ? 
                                                                 """, new_language_data)
         if not end_message:
-            return jsonify({'message': 'new profile added'})
+            return jsonify({'message': 'new profile added'}), 201
         else:
-            return jsonify({'message': 'profile could not be added', 'error_message': end_message})
+            return jsonify({'message': 'profile could not be added', 'error_message': end_message}), 406
     elif request.method == 'PUT':
         data = request.get_json()
         profile = Profile.query.get(id)
@@ -221,6 +216,8 @@ def manage_profiles(id=None):
 @user_route.route('/views/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def manage_views(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             view = View.query.get(id)
@@ -234,7 +231,7 @@ def manage_views(id=None):
                 'fiMovie': view.fiMovie,
                 'fiProfile': view.fiProfile
             }
-            return jsonify(view_data)
+            return jsonify(view_data),200
         else:
             views = View.query.all()
             return get_multiple_objects(views,['idView','dtMovieTime','fiSubtitle','fiMovie','fiProfile'])
@@ -249,9 +246,9 @@ def manage_views(id=None):
                                                                 @MovieTime = ? 
                                                                 """, new_profile_data)
         if not end_message:
-            return jsonify({'message': 'new view added'})
+            return jsonify({'message': 'new view added'}), 201
         else:
-            return jsonify({'message': 'view could not be added', 'error_message': end_message})
+            return jsonify({'message': 'view could not be added', 'error_message': end_message}),406
     elif request.method == 'PUT':
         data = request.get_json()
         view = View.query.get(id)
@@ -267,17 +264,19 @@ def manage_views(id=None):
 
         db.session.commit()
 
-        return jsonify({'message': 'View updated'})
+        return jsonify({'message': 'View updated'}),200
     elif request.method == 'DELETE':
         view = View.query.get(id)
         if not view:
-            return jsonify({'message': 'No View found!'})
+            return jsonify({'message': 'No View found!'}),404
 
 
 @user_route.route('/watchlist', methods=['GET', 'POST'])
 @user_route.route('/watchlist/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @auth_guard('admin')
 def handle_watchlist(id=None):
+    if id and not isinstance(id, int):
+        return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         if id:
             watchlist = WatchList.query.get(id)
@@ -297,7 +296,7 @@ def handle_watchlist(id=None):
         if not end_message:
             return jsonify({'message': 'new watchlist added'}), 201
         else:
-            return jsonify({'message': 'watchlist could not be added', 'error_message': end_message})
+            return jsonify({'message': 'watchlist could not be added', 'error_message': end_message}),406
     elif request.method == 'PUT':
         data = request.get_json()
         watchlist = WatchList.query.get(id)
@@ -306,13 +305,13 @@ def handle_watchlist(id=None):
         if 'fiProfile' in data:
             watchlist.fiProfile = data['fiProfile']
         db.session.commit()
-        return jsonify(watchlist.serialize())
+        return jsonify(watchlist.serialize()), 200
     elif request.method == 'DELETE':
         watchlist = WatchList.query.get(id)
         if watchlist is None:
             return jsonify(f'Watchlist with Id {id} does not exist'), 404
         db.session.delete(watchlist)
         db.session.commit()
-        return '', 204
+        return jsonify(f'Watchlist with Id {id} has been deleted'), 200
     else:
         return jsonify(f'Invalid request method'), 405
