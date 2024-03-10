@@ -70,17 +70,17 @@ def manage_users(id=None):
 
 @user_route.route('/subscriptions', methods=['GET', 'POST'])
 @user_route.route('/subscriptions/<id>', methods=['GET', 'POST', 'DELETE'])
-@auth_guard
+@auth_guard()
 def manage_subscriptions(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id'}), 400
     if request.method == 'GET':
         current_user_id = check_jwt_token()
+        current_user_id = current_user_id["idAccount"]
         account_details = call_stored_procedure_get("""
                                                                         GetAccountDetails
                                                                         @AccountID = ?
-                                                                    """,
-                                                    (current_user_id,))
+                                                                    """,(current_user_id))
         if not account_details:
             return jsonify({'message': 'Account details not found.'}), 404
         account_details = account_details[0]

@@ -19,16 +19,17 @@ def serialize_time(t):
     return None
 
 
-def call_stored_procedure_get(procedure_name: str, params: dict = None):
+def call_stored_procedure_get(procedure_name :str, params: tuple = None):
     connection = db.engine.raw_connection()
     try:
         cursor = connection.cursor()
         procedure_name = f"EXEC dbo.{procedure_name}"
         stored_procedure = text(procedure_name)
+        stored_procedure = str(stored_procedure)
         if params is None:
             cursor.execute(procedure_name)
         else:
-            cursor.execute(stored_procedure, **params)
+            cursor.execute(stored_procedure,params)
         results = cursor.fetchall()
         columns = [column[0] for column in cursor.description]
         serialized_results = []
