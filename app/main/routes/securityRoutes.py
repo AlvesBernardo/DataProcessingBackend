@@ -20,7 +20,7 @@ s = URLSafeTimedSerializer('secret')
 def login():
     try:
         data = request.get_json()
-        if not data or 'dtEmail' not in data or 'dtPassword' not in data:
+        if not verify_data(data,['dtEmail','dtPassword']):
             return jsonify({'message': 'Bad Request'}), 400
 
         user = None  # Initialize user to None
@@ -53,9 +53,8 @@ def login():
 @security.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-
-    if not data or not 'dtEmail' in data or not 'dtPassword' in data or not 'dtIsAdmin' in data or not 'fiSubscription' in data or not 'fiLanguage' in data or not 'dtRefreshToken' in data:
-        return jsonify({'message': 'Bad Request'}),400
+    if not verify_data(data,['dtEmail','dtPassword','dtIsAdmin','fiSubscription','fiLanguage','dtRefreshToken']):
+        return jsonify({'message': 'Bad Request'}), 400
     elif check(data['dtEmail']) and validate_password(data['dtPassword']):
         user = Account.query.filter_by(dtEmail=data['dtEmail']).first()
         if user:
@@ -108,9 +107,8 @@ def register():
 @security.route('/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.get_json()
-    if not data or not 'dtEmail' in data:
+    if not verify_data(data,['dtEmail']):
         return jsonify({'message': 'Bad Request'}), 400
-    
     email = data['dtEmail']
     if not email:
         return jsonify({'message': 'Email is required'}), 400
