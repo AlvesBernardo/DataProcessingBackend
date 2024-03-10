@@ -18,6 +18,7 @@ play_count = {}
 
 @movie_routes.route('/classifications', methods=['GET', 'POST'])
 @movie_routes.route('/classifications/<id>', methods=['GET', 'PUT', 'DELETE'])
+@auth_guard()
 def manage_classifications(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400

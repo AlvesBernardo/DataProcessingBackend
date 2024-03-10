@@ -111,13 +111,13 @@ def manage_subscriptions(id=None):
         else:
             return jsonify({'message': 'Subscription could not be added', 'error_message': end_message}),406
     elif request.method == 'DELETE':
-        subscription = Subcription.query.get(id)
-        if not subscription:
+        Subcription = Subcription.query.get(id)
+        if not Subcription:
             return jsonify({'message': 'No subscription found!'}), 404
-        db.session.delete(subscription)
+        db.session.delete(Subcription)
         db.session.commit()
 
-        return jsonify({'message': 'subscription has been deleted'}),200
+        return jsonify({'message': 'Subscription has been deleted'}), 200
 
 
 @user_route.route('/languages', methods=['GET', 'POST'])
