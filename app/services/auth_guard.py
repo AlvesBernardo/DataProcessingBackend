@@ -24,7 +24,7 @@ def auth_guard(role=None):
             except Exception as e:
                 return jsonify({"message": f'{e}', "status": 401}), 401
 
-            user_role = user_data.get('roles', '')
+            user_role = user_data.get('dtIsAdmin', '')
             if role and not (user_role == "user" or user_role == 'admin'):
                 return jsonify({"message": 'Authorization required.', "status": 403}), 403
 
