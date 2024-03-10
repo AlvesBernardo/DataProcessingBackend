@@ -37,7 +37,6 @@ def login():
                 user_info = {"idAccount": user.idAccount, "dtEmail": data['dtEmail']}
                 user_info['dtIsAdmin'] = "user" if user.dtIsAdmin == 0 else "admin"
                 token = handle_access_token(user_info,user,data)
-                # Other user info and token generation logic...
                 db.session.commit()
                 print(token)
                 return jsonify({'message': 'Logged in successfully', 'token': token}), 200
@@ -46,7 +45,7 @@ def login():
         else:
            return jsonify({'message': 'This email is not registered on the website'}), 401
     except SQLAlchemyError as e:
-        print(e)  # Or use logging
+        print(e) 
         return jsonify({'message': 'Internal Server Error'}), 500
 
     

@@ -215,6 +215,7 @@ def manage_qualities(id=None):
                                                                 """, new_profile_data)
         db.session.commit()
         if not end_message:
+            db.session.commit()
             return jsonify({'message': 'new quality added'}),201
         else:
             return jsonify({'message': 'quality could not be added', 'error_message': end_message}),406
@@ -301,4 +302,4 @@ def manage_subtitles(id=None):
         db.session.delete(subtitle)
         db.session.commit()
 
-        return jsonify({'message': 'Subtitle has been deleted'}),200
+        return jsonify({'message': 'Subtitle has been deleted'}),200
