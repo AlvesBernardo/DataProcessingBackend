@@ -21,12 +21,10 @@ play_count = {}
 def manage_classifications(id=None):
     if id and not id.isnumeric():
         return jsonify({'message': 'Invalid id type'}), 400
+    
     if request.method == 'GET':
-        if id:
-            return jsonify({'message': 'Invalid id type'}), 400
-        else:
-            classification_data = [{'id': 1, 'description': 'Classification 1'},
-                                   {'id': 2, 'description': 'Classification 2'}]
+        classification_data = [{'id': 1, 'description': 'Classification 1'},
+                                {'id': 2, 'description': 'Classification 2'}]
 
         if 'text/csv' in request.headers.get('Accept', ''):
             # Convert response data to CSV
@@ -168,6 +166,7 @@ def manage_movies(id=None):
             return jsonify({'message': 'No movie found!'}), 404
 
         movie.dtTitle = data.get('dtTitle', movie.dtTitle)
+        
     elif request.method == 'DELETE':
         end_message = call_stored_procedure_post("DeleteMovieAndRelatedContent @MovieID = ? ", (id,))
         if not end_message:
